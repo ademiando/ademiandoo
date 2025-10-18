@@ -215,17 +215,17 @@
             opacity: 1;
             transform: translateY(0);
         }
-        header a, #mobile-menu a, #mobile-menu footer a {
+        #mobile-menu a, #mobile-menu footer a, .fixed-header-item {
             transition: transform 0.3s ease, color 0.3s ease;
         }
-        header a:hover, #mobile-menu a:hover, #mobile-menu footer a:hover {
+        #mobile-menu a:hover, #mobile-menu footer a:hover, .fixed-header-item:hover {
             transform: translateY(-3px);
             color: #a5b4fc;
         }
-        #back-to-portfolio, #detail-icon-link-container a, #back-from-password {
+        #detail-icon-link-container a, #back-from-password {
             transition: transform 0.3s ease, color 0.3s ease;
         }
-        #back-to-portfolio:hover, #detail-icon-link-container a:hover, #back-from-password:hover {
+        #detail-icon-link-container a:hover, #back-from-password:hover {
             transform: scale(1.15);
             color: #fff;
         }
@@ -245,37 +245,38 @@
             border-radius: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        /* Sticky Header Styles */
-        #main-header, #project-detail header {
-            position: sticky;
-            top: 0;
-            z-index: 500;
-            background-color: transparent;
-            transition: background-color 0.4s ease-out, backdrop-filter 0.4s ease-out, box-shadow 0.4s ease-out;
-        }
-        #main-header.scrolled, #project-detail header.scrolled {
-            background-color: rgba(10, 10, 18, 0.5);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body class="antialiased">
     <div class="cursor"></div>
     <div id="page-transition-overlay"></div>
     <canvas id="bg-canvas"></canvas>
-
-    <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
-        <header id="main-header" class="flex justify-between items-center py-6">
-            <a href="#" class="text-2xl font-bold tracking-wider">A.</a>
-            <div class="menu-btn-wrapper z-50">
+    
+    <!-- Floating Header Items -->
+    <div id="main-header-items">
+        <a href="#" class="fixed-header-item fixed top-6 left-4 sm:left-6 lg:left-8 z-50 text-2xl font-bold tracking-wider">A.</a>
+        <div class="fixed top-6 right-4 sm:right-6 lg:right-8 z-50">
+            <div class="menu-btn-wrapper">
                 <div class="menu-btn">
                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
                 </div>
             </div>
-        </header>
+        </div>
+    </div>
+    <div id="detail-header-items" class="hidden">
+        <button id="back-to-portfolio" class="fixed-header-item fixed top-6 left-4 sm:left-6 lg:left-8 z-[150] p-2 text-gray-400">
+             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+         </button>
+         <div class="fixed top-6 right-4 sm:right-6 lg:right-8 z-[150]">
+            <div class="menu-btn-wrapper">
+                <div class="menu-btn">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 pt-24">
         <div id="portfolio-grid">
             <main class="py-16">
                 <h1 class="main-title reveal">ADEMIANDO</h1>
@@ -334,17 +335,7 @@ Key features include:
     </div>
     
     <div id="project-detail">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
-            <header class="flex justify-between items-center content-reveal">
-                 <button id="back-to-portfolio" class="p-2 text-gray-400">
-                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                 </button>
-                 <div class="menu-btn-wrapper z-50">
-                    <div class="menu-btn">
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                    </div>
-                </div>
-            </header>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
             <div class="mt-16 text-center content-reveal">
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
@@ -415,7 +406,6 @@ Key features include:
         const mobileMenu = document.getElementById('mobile-menu');
         const projectDetailView = document.getElementById('project-detail');
         const cards = document.querySelectorAll('.card');
-        const backToPortfolioBtn = document.getElementById('back-to-portfolio');
         const homeLink = document.getElementById('home-link');
         const cursor = document.querySelector('.cursor');
         const docLink = document.getElementById('doc-link');
@@ -424,8 +414,9 @@ Key features include:
         const passwordError = document.getElementById('password-error');
         const backFromPasswordBtn = document.getElementById('back-from-password');
         const transitionOverlay = document.getElementById('page-transition-overlay');
-        const mainHeader = document.getElementById('main-header');
-        const detailHeader = projectDetailView.querySelector('header');
+        const mainHeaderItems = document.getElementById('main-header-items');
+        const detailHeaderItems = document.getElementById('detail-header-items');
+        const backToPortfolioBtn = detailHeaderItems.querySelector('#back-to-portfolio');
 
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
@@ -514,6 +505,9 @@ Key features include:
         });
 
         function showProjectDetail(data) {
+            mainHeaderItems.classList.add('hidden');
+            detailHeaderItems.classList.remove('hidden');
+
             document.getElementById('detail-category').textContent = data.category;
             document.getElementById('detail-title').textContent = data.title;
             document.getElementById('detail-img').src = data.img;
@@ -554,6 +548,9 @@ Key features include:
         function hideProjectDetail() {
             document.body.classList.remove('detail-view-active');
             projectDetailView.classList.remove('visible');
+            mainHeaderItems.classList.remove('hidden');
+            detailHeaderItems.classList.add('hidden');
+            
             projectDetailView.querySelectorAll('.content-reveal').forEach(el => {
                 el.classList.remove('visible');
             });
@@ -562,6 +559,8 @@ Key features include:
         function showPasswordPage() {
             document.body.classList.add('detail-view-active');
             passwordPage.classList.add('visible');
+            mainHeaderItems.classList.add('hidden');
+            detailHeaderItems.classList.add('hidden');
         }
 
         function hidePasswordPage() {
@@ -569,6 +568,7 @@ Key features include:
             passwordPage.classList.remove('visible');
             passwordError.textContent = '';
             passwordForm.reset();
+            mainHeaderItems.classList.remove('hidden');
         }
 
         docLink.addEventListener('click', (e) => {
@@ -633,23 +633,6 @@ Key features include:
         
         window.addEventListener('load', () => {
             performTransition(() => {});
-        });
-        
-        // Sticky header logic
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 10) {
-                mainHeader.classList.add('scrolled');
-            } else {
-                mainHeader.classList.remove('scrolled');
-            }
-        });
-
-        projectDetailView.addEventListener('scroll', () => {
-            if (projectDetailView.scrollTop > 10) {
-                detailHeader.classList.add('scrolled');
-            } else {
-                detailHeader.classList.remove('scrolled');
-            }
         });
 
 
