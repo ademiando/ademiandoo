@@ -93,7 +93,7 @@
             display: none;
         }
 
-        /* Title with Shine Animation */
+        /* Title with Continuous Shine Animation */
         .main-title {
             font-size: clamp(2.5rem, 10vw, 4rem); 
             font-weight: 100;
@@ -106,7 +106,7 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 2.5s linear 1;
+            animation: shine 4s linear infinite; /* Changed to infinite */
         }
         @keyframes shine {
             to {
@@ -231,6 +231,14 @@
           30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
           40%, 60% { transform: translate3d(4px, 0, 0); }
         }
+        /* New Glassmorphism Card Style for Password Page */
+        .glassmorphism-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -339,12 +347,12 @@ Key features include:
     </div>
 
     <div id="password-page">
-        <div class="bg-gray-900 p-8 shadow-2xl w-full max-w-sm text-center border border-gray-700">
+        <div class="glassmorphism-card p-8 shadow-2xl w-full max-w-sm text-center">
             <h2 class="text-xl font-light text-white tracking-wider">ACCESS RESTRICTED</h2>
             <p class="text-gray-400 text-sm mt-2">Enter password to view document.</p>
             <form id="password-form" class="mt-6">
-                <input type="password" id="password-input" class="w-full bg-gray-800 border border-gray-600 text-white text-center p-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="************">
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 mt-4 transition-colors">AUTHENTICATE</button>
+                <input type="password" id="password-input" class="w-full bg-gray-800/50 border border-gray-600 text-white text-center p-3 focus:outline-none focus:border-indigo-500 transition-colors rounded-md" placeholder="************">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 mt-4 transition-colors rounded-md">AUTHENTICATE</button>
             </form>
             <p id="password-error" class="text-red-500 text-sm mt-4 h-5"></p>
             <button id="back-from-password" class="text-gray-500 hover:text-white text-sm mt-6">← Back to Portfolio</button>
