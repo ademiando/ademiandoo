@@ -1,9 +1,28 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ademiando | Portfolio</title>
+    
+    <!-- SEO and Meta Tags -->
+    <meta name="description" content="Ademiando's interactive portfolio, showcasing ideas, experiments, and explorations in web development, WebGL, and 3D design.">
+    <meta name="keywords" content="Ademiando, portfolio, WebGL, 3D, developer, interactive, design, javascript">
+    <meta name="author" content="Ademiando">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Ademiando | Interactive Portfolio">
+    <meta property="og:description" content="Exploring ideas and experiments in modern web technology.">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Ademiando | Interactive Portfolio">
+    <meta property="twitter:description" content="Exploring ideas and experiments in modern web technology.">
+
+    <!-- Favicon (Logo Kecil) - SVG "A" -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='Inter, sans-serif' font-weight='bold' fill='white'>A</text></svg>">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -22,7 +41,32 @@
             height: 100%;
             z-index: -1;
         }
-        /* Enhanced Water Ripple Cursor with a visible dot */
+        /* Page Transition Overlay */
+        #page-transition-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #0A0A12;
+            z-index: 2000;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Faster fade out */
+            pointer-events: none;
+            overflow: hidden;
+        }
+        #page-transition-overlay.out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        @keyframes sweep-right {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        @keyframes sweep-left {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        
         .cursor {
             position: fixed;
             top: 0;
@@ -32,7 +76,6 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.2s ease;
-            /* This is the central dot */
             width: 8px;
             height: 8px;
             background-color: white;
@@ -45,13 +88,13 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-50%, -50%); /* Center ripple inside the dot */
+            transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
             border-radius: 50%;
             border: 1px solid white;
             animation: water-ripple-effect 1.2s ease-out forwards;
-            opacity: 0; /* Animation will handle opacity */
+            opacity: 0;
         }
         .cursor.hovered {
             transform: translate(-50%, -50%) scale(1.8);
@@ -61,14 +104,8 @@
              animation-duration: 1s;
         }
         @keyframes water-ripple-effect {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.5);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
         body.is-touch .cursor {
             display: none;
@@ -77,10 +114,18 @@
         .main-title {
             font-size: clamp(2.5rem, 10vw, 4rem); 
             font-weight: 100;
-            color: rgba(255, 255, 255, 0.8);
             letter-spacing: 0.1em;
             text-align: center;
+            background: linear-gradient(to right, #6b7280 20%, #ffffff 50%, #6b7280 80%);
+            background-size: 200% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
         }
+        @keyframes shine { to { background-position: -200% center; } }
+
         .subtitle {
             font-weight: 300;
             color: rgba(255, 255, 255, 0.6);
@@ -94,7 +139,7 @@
         .card:hover .card-image {
             transform: scale(1.05);
         }
-
+        
         #mobile-menu {
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
             opacity: 0; 
@@ -107,14 +152,27 @@
             opacity: 1; 
             visibility: visible;
         }
-        #project-detail {
+        #project-detail, #password-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0A0A12; z-index: 100; overflow-y: auto;
+            z-index: 100;
             opacity: 0; visibility: hidden;
             transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        #project-detail {
+            background-color: #0A0A12; 
+            overflow-y: auto;
             transform: translateY(20px);
         }
-        #project-detail.visible {
+        #password-page {
+             background-color: rgba(10, 10, 18, 0.7);
+             backdrop-filter: blur(8px);
+             -webkit-backdrop-filter: blur(8px);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+        }
+
+        #project-detail.visible, #password-page.visible {
             opacity: 1; visibility: visible; transform: translateY(0);
         }
         #portfolio-grid {
@@ -123,7 +181,7 @@
         body.detail-view-active #portfolio-grid {
             opacity: 0; transform: scale(0.95); pointer-events: none;
         }
-
+        
         .menu-btn-wrapper {
             padding: 0.5rem; 
         }
@@ -141,24 +199,19 @@
         .menu-btn .bar:nth-child(2) { top: 9px; }
         .menu-btn .bar:nth-child(3) { top: 18px; }
 
-        .menu-btn.open .bar:nth-child(1) {
-            top: 9px; transform: rotate(135deg);
-        }
-        .menu-btn.open .bar:nth-child(2) {
-            opacity: 0; left: -30px;
-        }
-        .menu-btn.open .bar:nth-child(3) {
-            top: 9px; transform: rotate(-135deg);
-        }
+        .menu-btn.open .bar:nth-child(1) { top: 9px; transform: rotate(135deg); }
+        .menu-btn.open .bar:nth-child(2) { opacity: 0; left: -30px; }
+        .menu-btn.open .bar:nth-child(3) { top: 9px; transform: rotate(-135deg); }
+
         #detail-brief-text {
             white-space: pre-line;
         }
-        .reveal {
+        .reveal, .content-reveal {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .reveal.visible {
+        .reveal.visible, .content-reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -169,17 +222,34 @@
             transform: translateY(-3px);
             color: #a5b4fc;
         }
-        #back-to-portfolio, #detail-icon-link-container a {
+        #back-to-portfolio, #detail-icon-link-container a, #back-from-password {
             transition: transform 0.3s ease, color 0.3s ease;
         }
-        #back-to-portfolio:hover, #detail-icon-link-container a:hover {
+        #back-to-portfolio:hover, #detail-icon-link-container a:hover, #back-from-password:hover {
             transform: scale(1.15);
             color: #fff;
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .glassmorphism-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body class="antialiased">
     <div class="cursor"></div>
+    <div id="page-transition-overlay"></div>
     <canvas id="bg-canvas"></canvas>
 
     <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
@@ -226,8 +296,9 @@ Key features include:
                        data-category="API | BACKEND" 
                        data-title="Project FinTrack API"
                        data-img="assets/assets2.jpg"
-                       data-client="JUNGLE STUDIOS" 
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="BACKEND DEVELOPER"
+                       data-link="/project2"
                        data-brief-title="Financial Tracking API Service"
                        data-brief-text="This is a placeholder description for the FinTrack API project. It involves creating a robust backend service for financial data aggregation and analysis.">
                         <img src="assets/assets2.jpg" alt="Project FinTrack API" class="w-full h-full object-cover card-image">
@@ -236,8 +307,9 @@ Key features include:
                        data-category="AI | GENERATIVE TEXT" 
                        data-title="Project Housel Philosophy (EssayGen)"
                        data-img="assets/assets3.jpg"
-                       data-client="ACADEMIC RESEARCH" 
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="AI ENGINEER | RESEARCHER"
+                       data-link="/project3"
                        data-brief-title="AI-Powered Philosophy Essay Generator"
                        data-brief-text="This is a placeholder description for the Housel Philosophy project. It focuses on using generative AI models to create philosophical essays and arguments.">
                         <img src="assets/assets3.jpg" alt="Project Housel Philosophy" class="w-full h-full object-cover card-image">
@@ -246,10 +318,10 @@ Key features include:
             </main>
         </div>
     </div>
-
+    
     <div id="project-detail">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
-            <header class="flex justify-between items-center">
+            <header class="flex justify-between items-center content-reveal">
                  <button id="back-to-portfolio" class="p-2 text-gray-400">
                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                  </button>
@@ -259,25 +331,37 @@ Key features include:
                     </div>
                 </div>
             </header>
-            <div class="mt-16 text-center">
+            <div class="mt-16 text-center content-reveal">
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
-            <div class="mt-12 overflow-hidden rounded-none">
+            <div class="mt-12 overflow-hidden rounded-none content-reveal">
                 <img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover">
             </div>
+            
+            <div id="detail-icon-link-container" class="text-center mt-4 content-reveal"></div>
 
-            <div id="detail-icon-link-container" class="text-center mt-4"></div>
-
-            <div class="mt-8 px-2">
+            <div class="mt-8 px-2 content-reveal">
                 <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
                 <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
             </div>
-            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500">[ BRIEF ]</div>
-            <div class="mt-12 max-w-2xl mx-auto text-left">
+            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500 content-reveal">[ BRIEF ]</div>
+            <div class="mt-12 max-w-2xl mx-auto text-left content-reveal">
                 <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
                 <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
             </div>
+        </div>
+    </div>
+
+    <div id="password-page">
+        <div class="glassmorphism-card p-8 shadow-2xl w-full max-w-sm text-center">
+            <h2 class="text-xl font-light text-white tracking-wider">ACCESS RESTRICTED</h2>
+            <form id="password-form" class="mt-6">
+                <input type="password" id="password-input" class="w-full bg-gray-800/50 border border-gray-600 text-white text-center p-3 focus:outline-none focus:border-indigo-500 transition-colors rounded-md" placeholder="************">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 mt-4 transition-colors rounded-md">AUTHENTICATE</button>
+            </form>
+            <p id="password-error" class="text-red-500 text-sm mt-4 h-5"></p>
+            <button id="back-from-password" class="text-gray-500 hover:text-white text-sm mt-6">← Back to Home</button>
         </div>
     </div>
 
@@ -295,7 +379,7 @@ Key features include:
                 <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white">Service</a>
                 <a href="#" class="text-4xl font-bold text-white">Art</a>
                 <a href="#" class="text-4xl font-bold text-white">Info</a>
-                <a href="#" class="text-4xl font-bold text-white">Doc</a>
+                <a href="#" id="doc-link" class="text-4xl font-bold text-white">Doc</a>
             </nav>
             <footer class="flex justify-center items-center space-x-8">
                 <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
@@ -320,6 +404,12 @@ Key features include:
         const backToPortfolioBtn = document.getElementById('back-to-portfolio');
         const homeLink = document.getElementById('home-link');
         const cursor = document.querySelector('.cursor');
+        const docLink = document.getElementById('doc-link');
+        const passwordPage = document.getElementById('password-page');
+        const passwordForm = document.getElementById('password-form');
+        const passwordError = document.getElementById('password-error');
+        const backFromPasswordBtn = document.getElementById('back-from-password');
+        const transitionOverlay = document.getElementById('page-transition-overlay');
 
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
@@ -333,12 +423,12 @@ Key features include:
             rippleContainer.style.top = `${y}px`;
             rippleContainer.style.zIndex = '1000';
             rippleContainer.style.pointerEvents = 'none';
-
+            
             const ripple = document.createElement('div');
             ripple.className = 'ripple';
             rippleContainer.appendChild(ripple);
             document.body.appendChild(rippleContainer);
-
+            
             setTimeout(() => {
                 rippleContainer.remove();
             }, 1200);
@@ -350,21 +440,13 @@ Key features include:
                 cursor.style.left = `${e.clientX}px`;
                 cursor.style.top = `${e.clientY}px`;
             });
-            let rippleInterval = setInterval(() => {
-                 if (!cursor.matches('.hovered')) { 
-                    const newRipple = document.createElement('div');
-                    newRipple.className = 'ripple';
-                    cursor.appendChild(newRipple);
-                    setTimeout(() => newRipple.remove(), 1200);
-                 }
-            }, 800);
         } else {
             document.addEventListener('touchstart', (e) => {
                 const touch = e.touches[0];
                 createRipple(touch.clientX, touch.clientY);
             }, {passive: true});
         }
-
+        
         const interactiveElements = document.querySelectorAll('a, button, .menu-btn-wrapper');
         interactiveElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
@@ -387,14 +469,32 @@ Key features include:
 
         menuBtnWrappers.forEach(wrapper => wrapper.addEventListener('click', toggleMenu));
 
+        function performTransition(action) {
+            transitionOverlay.classList.remove('out');
+            transitionOverlay.innerHTML = ''; // Clear previous
+            
+            const lightSweepLeft = document.createElement('div');
+            lightSweepLeft.style.cssText = 'position: absolute; top: 50%; right: 50%; width: 50%; height: 1px; background: linear-gradient(to left, white, transparent); transform-origin: right; animation: sweep-left 0.4s ease-in-out;';
+            const lightSweepRight = document.createElement('div');
+            lightSweepRight.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(to right, white, transparent); transform-origin: left; animation: sweep-right 0.4s ease-in-out;';
+            transitionOverlay.appendChild(lightSweepLeft);
+            transitionOverlay.appendChild(lightSweepRight);
+
+            setTimeout(() => {
+                action();
+                setTimeout(() => {
+                    transitionOverlay.classList.add('out');
+                }, 50);
+            }, 400);
+        }
+
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
-            if (projectDetailView.classList.contains('visible')) {
+            performTransition(() => {
                 hideProjectDetail();
-            }
-            if (mobileMenu.classList.contains('open')) {
-                toggleMenu();
-            }
+                hidePasswordPage();
+                if (mobileMenu.classList.contains('open')) toggleMenu();
+            });
         });
 
         function showProjectDetail(data) {
@@ -405,7 +505,7 @@ Key features include:
             document.getElementById('detail-role').textContent = data.role;
             document.getElementById('detail-brief-title').textContent = data.briefTitle;
             document.getElementById('detail-brief-text').textContent = data.briefText;
-
+            
             const iconLinkContainer = document.getElementById('detail-icon-link-container');
             iconLinkContainer.innerHTML = ''; 
 
@@ -414,20 +514,66 @@ Key features include:
                 linkIcon.href = data.link;
                 linkIcon.target = '_blank';
                 linkIcon.rel = 'noopener noreferrer';
-                linkIcon.className = 'inline-block text-gray-400';
-                linkIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                linkIcon.className = 'inline-flex items-center space-x-2 text-gray-400';
+                linkIcon.innerHTML = `
+                    <span class="text-sm tracking-wider">VIEW</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>`;
                 iconLinkContainer.appendChild(linkIcon);
             }
 
             document.body.classList.add('detail-view-active');
             projectDetailView.classList.add('visible');
             projectDetailView.scrollTo(0, 0);
+
+            const contentToReveal = projectDetailView.querySelectorAll('.content-reveal');
+            contentToReveal.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, index * 100);
+            });
         }
 
         function hideProjectDetail() {
             document.body.classList.remove('detail-view-active');
             projectDetailView.classList.remove('visible');
+            projectDetailView.querySelectorAll('.content-reveal').forEach(el => {
+                el.classList.remove('visible');
+            });
         }
+        
+        function showPasswordPage() {
+            document.body.classList.add('detail-view-active');
+            passwordPage.classList.add('visible');
+        }
+
+        function hidePasswordPage() {
+            document.body.classList.remove('detail-view-active');
+            passwordPage.classList.remove('visible');
+            passwordError.textContent = '';
+            passwordForm.reset();
+        }
+
+        docLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (mobileMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+            performTransition(showPasswordPage);
+        });
+        
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            passwordError.textContent = 'ACCESS DENIED: INCORRECT PASSWORD';
+            const formContainer = passwordPage.querySelector('div');
+            formContainer.classList.add('shake');
+            setTimeout(() => {
+                formContainer.classList.remove('shake');
+            }, 500);
+        });
+        
+        backFromPasswordBtn.addEventListener('click', () => performTransition(hidePasswordPage));
 
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
@@ -438,7 +584,7 @@ Key features include:
                     role: card.dataset.role, briefTitle: card.dataset.briefTitle,
                     briefText: card.dataset.briefText, link: card.dataset.link 
                 };
-                showProjectDetail(data);
+                performTransition(() => showProjectDetail(data));
             });
 
             card.addEventListener('mousemove', (e) => {
@@ -457,8 +603,8 @@ Key features include:
                 card.style.transition = 'transform 0.5s ease-in-out';
             });
         });
-        backToPortfolioBtn.addEventListener('click', hideProjectDetail);
-
+        backToPortfolioBtn.addEventListener('click', () => performTransition(hideProjectDetail));
+        
         const revealElements = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -468,6 +614,10 @@ Key features include:
             });
         }, { threshold: 0.1 });
         revealElements.forEach(el => observer.observe(el));
+        
+        window.addEventListener('load', () => {
+            performTransition(() => {}); // Run empty action to just show transition
+        });
 
 
         // --- WebGL Background Logic ---
@@ -495,24 +645,17 @@ Key features include:
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // SCENE 1: Monolith Artifact (Enhanced)
         function createMonolithScene() {
             scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
             camera.position.z = 7;
             const geometry = new THREE.BoxGeometry(0.7, 5, 0.7);
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x111827, metalness: 0.95, roughness: 0.3,
-            });
+            const material = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.95, roughness: 0.3 });
             const monolith = new THREE.Mesh(geometry, material);
             scene.add(monolith);
-
             const spotlight = new THREE.SpotLight(0xffffff, 5, 30, Math.PI * 0.1, 0.4, 1.5);
             spotlight.position.set(0, 5, 5);
             scene.add(spotlight);
-
-            const ambient = new THREE.AmbientLight(0xffffff, 0.05);
-            scene.add(ambient);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.05));
             animationLoop = () => {
                 const t = clock.getElapsedTime();
                 monolith.rotation.y = t * 0.08;
@@ -523,84 +666,61 @@ Key features include:
             };
         }
 
-        // SCENE 2: Tectonic Waves (Enhanced)
         function createTectonicScene() {
             camera.position.set(0, 4, 6);
             camera.lookAt(0, 0, 0);
             scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
             const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x030712, metalness: 0.8, roughness: 0.6
-            });
+            const material = new THREE.MeshStandardMaterial({ color: 0x030712, metalness: 0.8, roughness: 0.6 });
             const plane = new THREE.Mesh(geometry, material);
             plane.rotation.x = -Math.PI / 2;
             scene.add(plane);
-
             const originalPositions = new Float32Array(geometry.attributes.position.array);
-
             const light1 = new THREE.PointLight(0x5b21b6, 3, 15);
             light1.position.set(-8, 2, 0);
             scene.add(light1);
-
             const light2 = new THREE.PointLight(0x155e75, 3, 15);
             light2.position.set(8, 2, 0);
             scene.add(light2);
-
             animationLoop = () => {
                 const t = clock.getElapsedTime();
                 const positions = geometry.attributes.position.array;
                 for (let i = 0; i < positions.length / 3; i++) {
-                    const x = originalPositions[i * 3];
-                    const y = originalPositions[i * 3 + 1];
-                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4;
-                    const wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
+                    const x = originalPositions[i * 3], y = originalPositions[i * 3 + 1];
+                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4, wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
                     positions[i * 3 + 2] = wave1 + wave2;
                 }
                 geometry.attributes.position.needsUpdate = true;
-
                 light1.position.x = Math.sin(t * 0.5) * 8;
                 light2.position.x = Math.cos(t * 0.3) * -8;
             };
         }
-
-        // SCENE 3: Cosmic Rings (Enhanced)
+        
         function createRingsScene() {
             camera.position.set(0, 3, 7);
             camera.lookAt(0, 0, 0);
-
             const ringsGroup = new THREE.Group();
             scene.add(ringsGroup);
-
             const createRing = (radius) => {
-                const geometry = new THREE.TorusGeometry(radius, 0.025, 24, 128);
-                const material = new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 });
-                const ring = new THREE.Mesh(geometry, material);
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.025, 24, 128), new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 }));
                 ring.rotation.x = Math.PI / 2;
                 return ring;
             };
-
-            for(let i = 0; i < 5; i++) {
-                ringsGroup.add(createRing(2.5 + i * 0.5));
-            }
-
+            for(let i = 0; i < 5; i++) ringsGroup.add(createRing(2.5 + i * 0.5));
             const keyLight = new THREE.SpotLight(0xffffff, 8, 30, Math.PI * 0.1, 0.2, 2);
             keyLight.position.set(0, 8, 4);
             scene.add(keyLight);
-
-            const ambient = new THREE.AmbientLight(0xffffff, 0.1);
-            scene.add(ambient);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.1));
             animationLoop = () => {
                 const t = clock.getElapsedTime();
-                ringsGroup.children.forEach((ring, index) => {
-                    ring.rotation.z = t * (0.1 - index * 0.02) * (index % 2 === 0 ? 1 : -1);
+                ringsGroup.children.forEach((ring, i) => {
+                    ring.rotation.z = t * (0.1 - i * 0.02) * (i % 2 === 0 ? 1 : -1);
                 });
                 ringsGroup.rotation.y = t * 0.04;
                 ringsGroup.rotation.z = t * 0.02;
             };
         }
 
-        // --- Initialize ---
         function animate() {
             requestAnimationFrame(animate);
             animationLoop();
@@ -609,9 +729,9 @@ Key features include:
 
         initBaseScene();
         const scenes = [createMonolithScene, createTectonicScene, createRingsScene];
-        const randomSceneIndex = Math.floor(Math.random() * scenes.length);
-        scenes[randomSceneIndex]();
+        scenes[Math.floor(Math.random() * scenes.length)]();
         animate();
     </script>
 </body>
 </html>
+
