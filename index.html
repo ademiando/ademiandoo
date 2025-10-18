@@ -41,12 +41,19 @@
         .card:hover .card-image {
             transform: scale(1.05);
         }
+        
+        /* New Glassmorphism Menu Style */
         #mobile-menu {
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-            opacity: 0; visibility: hidden; background-color: #000000;
+            opacity: 0; 
+            visibility: hidden; 
+            background-color: rgba(10, 10, 18, 0.5); /* Semi-transparent background */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); /* For Safari */
         }
         #mobile-menu.open {
-            opacity: 1; visibility: visible;
+            opacity: 1; 
+            visibility: visible;
         }
         #project-detail {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -65,10 +72,15 @@
             opacity: 0; transform: scale(0.95); pointer-events: none;
         }
         
-        /* New Animated Hamburger Icon Styles */
+        /* Animated Hamburger Icon Styles */
+        .menu-btn-wrapper {
+             /* Wrapper to give some padding for easier clicking */
+            padding: 0.5rem; 
+        }
         .menu-btn {
-            width: 30px; height: 22px; position: relative;
+            width: 28px; height: 22px; position: relative;
             transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
         }
         .menu-btn .bar {
             display: block; position: absolute; height: 3px; width: 100%;
@@ -99,9 +111,11 @@
         <!-- Header -->
         <header id="main-header" class="flex justify-between items-center py-6">
             <a href="#" class="text-2xl font-bold tracking-wider">A.</a>
-            <button class="menu-btn z-50 p-2 focus:outline-none">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </button>
+            <div class="menu-btn-wrapper z-50">
+                <div class="menu-btn">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </div>
+            </div>
         </header>
 
         <div id="portfolio-grid">
@@ -150,9 +164,11 @@
                  <button id="back-to-portfolio" class="p-2 text-gray-400 hover:text-white transition-colors">
                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                  </button>
-                 <button class="menu-btn p-2 text-gray-400 hover:text-white transition-colors">
-                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                 </button>
+                 <div class="menu-btn-wrapper z-50">
+                    <div class="menu-btn">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </div>
             </header>
             <div class="mt-16 text-center">
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
@@ -171,13 +187,15 @@
         </div>
     </div>
 
-    <!-- New Mobile Navigation Menu -->
+    <!-- Glassmorphism Mobile Navigation Menu -->
     <div id="mobile-menu" class="fixed inset-0 z-[200]">
         <div class="relative w-full h-full flex flex-col p-6 sm:p-8">
             <header class="flex justify-end items-center">
-                <button id="close-menu-btn" class="p-2 text-white">
-                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+                 <div class="menu-btn-wrapper">
+                    <div class="menu-btn open">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </div>
             </header>
             <nav class="flex-grow flex flex-col items-center justify-center space-y-8 -mt-10">
                 <a href="#" id="home-link" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Home</a>
@@ -201,9 +219,9 @@
         import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
 
         // --- Element Selectors ---
+        const menuBtnWrappers = document.querySelectorAll('.menu-btn-wrapper');
         const menuBtns = document.querySelectorAll('.menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        const closeMenuBtn = document.getElementById('close-menu-btn');
         const projectDetailView = document.getElementById('project-detail');
         const cards = document.querySelectorAll('.card');
         const backToPortfolioBtn = document.getElementById('back-to-portfolio');
@@ -211,21 +229,19 @@
 
         // --- Menu Logic ---
         function toggleMenu() {
-            mobileMenu.classList.toggle('open');
-            document.body.classList.toggle('overflow-hidden');
-            // Toggle animation class on all hamburger buttons
-            menuBtns.forEach(btn => btn.classList.toggle('open'));
+            const isOpen = mobileMenu.classList.toggle('open');
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+            // Sync all hamburger icons to the correct state
+            menuBtns.forEach(btn => btn.classList.toggle('open', isOpen));
         }
 
-        menuBtns.forEach(btn => btn.addEventListener('click', toggleMenu));
-        closeMenuBtn.addEventListener('click', toggleMenu);
+        menuBtnWrappers.forEach(wrapper => wrapper.addEventListener('click', toggleMenu));
 
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
             if (projectDetailView.classList.contains('visible')) {
                 hideProjectDetail();
             }
-            // Close menu if it's open
             if (mobileMenu.classList.contains('open')) {
                 toggleMenu();
             }
