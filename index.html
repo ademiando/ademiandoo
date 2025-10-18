@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ademiando | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #E0E0E0;
+            background-color: #0A0A12;
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .main-title {
+            font-size: clamp(3rem, 15vw, 8rem);
+            font-weight: 100;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+        .subtitle {
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.25em;
+            font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+            text-align: center;
+        }
+        .card-image {
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
+        #mobile-menu {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            opacity: 0; visibility: hidden; background-color: #000000;
+        }
+        #mobile-menu.open {
+            opacity: 1; visibility: visible;
+        }
+        #project-detail {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0A0A12; z-index: 100; overflow-y: auto;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        #project-detail.visible {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        #portfolio-grid {
+             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        body.detail-view-active #portfolio-grid {
+            opacity: 0; transform: scale(0.95); pointer-events: none;
+        }
+        
+        /* New Animated Hamburger Icon Styles */
+        .menu-btn {
+            width: 30px; height: 22px; position: relative;
+            transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
+        }
+        .menu-btn .bar {
+            display: block; position: absolute; height: 3px; width: 100%;
+            background: #fff; border-radius: 3px; opacity: 1; left: 0;
+            transform: rotate(0deg); transition: .25s ease-in-out;
+        }
+        .menu-btn .bar:nth-child(1) { top: 0px; }
+        .menu-btn .bar:nth-child(2) { top: 9px; }
+        .menu-btn .bar:nth-child(3) { top: 18px; }
+
+        .menu-btn.open .bar:nth-child(1) {
+            top: 9px; transform: rotate(135deg);
+        }
+        .menu-btn.open .bar:nth-child(2) {
+            opacity: 0; left: -30px;
+        }
+        .menu-btn.open .bar:nth-child(3) {
+            top: 9px; transform: rotate(-135deg);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- WebGL Interactive Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Content -->
+    <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
+        <!-- Header -->
+        <header id="main-header" class="flex justify-between items-center py-6">
+            <a href="#" class="text-2xl font-bold tracking-wider">A.</a>
+            <button class="menu-btn z-50 p-2 focus:outline-none">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </header>
+
+        <div id="portfolio-grid">
+            <main class="py-16">
+                <h1 class="main-title">ADEMIANDO</h1>
+                <p class="subtitle mt-2">
+                    <span>PROJECTS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>COLLABORATIONS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>EXPLORATIONS</span>
+                </p>
+
+                <!-- Cards Section -->
+                <div class="mt-20 max-w-2xl mx-auto space-y-8">
+                    <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer" 
+                       data-category="CAMPAIGN | WEBSITE" data-title="855-HOW-TO-QUIT (OPIOIDS)"
+                       data-img="https://images.unsplash.com/photo-1584515933487-779824d27bfb?q=80&w=1770&auto=format&fit=crop"
+                       data-client="RAW MATERIALS, SERVICE PLAN" data-role="CREATIVE TECHNOLOGIST | LEAD DEVELOPER"
+                       data-brief-title="A Life-Saving Digital Experience"
+                       data-brief-text="Opioid addiction affects over 6 million people in the U.S., with someone dying from an overdose every six minutes. 855-How-To-Quit is a groundbreaking hotline designed to intervene at critical moments, using a unique approach: the numerical codes on opioid pills double as phone numbers. When dialed, these numbers connect users to inspiring stories of recovery, followed by live counseling with addiction experts.">
+                        <img src="https://images.unsplash.com/photo-1584515933487-779824d27bfb?q=80&w=1770&auto=format&fit=crop" alt="Abstract image of pills" class="w-full h-full object-cover card-image">
+                    </a>
+                     <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer"
+                       data-category="EXPERIENCE | INSTALLATION" data-title="VASES OF HATRED"
+                       data-img="https://images.unsplash.com/photo-1535284367339-a249a4a73735?q=80&w=1858&auto=format&fit=crop"
+                       data-client="JUNGLE STUDIOS" data-role="INTERACTIVE ARTIST | 3D MODELER"
+                       data-brief-title="An Immersive Botanical Horror"
+                       data-brief-text="Vases of Hatred is an interactive art installation that explores the darker side of nature. Visitors enter a dimly lit space filled with exotic, bioluminescent plants. As they approach, the plants react with subtle, unsettling movements and sounds, creating a tense atmosphere. The experience blurs the line between beauty and fear, technology and the natural world.">
+                        <img src="https://images.unsplash.com/photo-1535284367339-a249a4a73735?q=80&w=1858&auto=format&fit=crop" alt="Dark jungle scene" class="w-full h-full object-cover card-image">
+                    </a>
+                     <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer"
+                       data-category="AR | GAMING" data-title="PIZZA POWER"
+                       data-img="https://images.unsplash.com/photo-1635363294263-89689e4c8524?q=80&w=1770&auto=format&fit=crop"
+                       data-client="PIZZA HUT x TMNT" data-role="AR DEVELOPER | GAME DESIGNER"
+                       data-brief-title="Cowabunga! Your Pizza Box is a Portal"
+                       data-brief-text="In this collaboration with Pizza Hut and Teenage Mutant Ninja Turtles, we turned every pizza box into an augmented reality arcade. By scanning a QR code, users launch a web-based AR game where the Ninja Turtles battle Shredder's minions right on their table. The game features collectible power-ups and social sharing integrations.">
+                        <img src="https://images.unsplash.com/photo-1635363294263-89689e4c8524?q=80&w=1770&auto=format&fit=crop" alt="Pizza and retro game" class="w-full h-full object-cover card-image">
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="project-detail">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <header class="flex justify-between items-center">
+                 <button id="back-to-portfolio" class="p-2 text-gray-400 hover:text-white transition-colors">
+                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                 </button>
+                 <button class="menu-btn p-2 text-gray-400 hover:text-white transition-colors">
+                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                 </button>
+            </header>
+            <div class="mt-16 text-center">
+                <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
+                <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
+            </div>
+            <div class="mt-12 rounded-lg overflow-hidden"><img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover"></div>
+            <div class="mt-8 px-2">
+                <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
+                <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
+            </div>
+            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500">[ BRIEF ]</div>
+            <div class="mt-12 max-w-2xl mx-auto text-left">
+                <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
+                <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Mobile Navigation Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[200]">
+        <div class="relative w-full h-full flex flex-col p-6 sm:p-8">
+            <header class="flex justify-end items-center">
+                <button id="close-menu-btn" class="p-2 text-white">
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </header>
+            <nav class="flex-grow flex flex-col items-center justify-center space-y-8 -mt-10">
+                <a href="#" id="home-link" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Home</a>
+                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Service</a>
+                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Art</a>
+                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Info</a>
+                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Doc</a>
+            </nav>
+            <footer class="flex justify-center items-center space-x-8">
+                <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
+                </a>
+                <a href="https://instagram.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.012 3.584-.07 4.85c-.148 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.85s.012-3.584.07-4.85C2.447 3.896 3.964 2.353 7.15 2.225c1.265-.058 1.644-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998zM16.965 6.57a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" /></svg>
+                </a>
+            </footer>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
+
+        // --- Element Selectors ---
+        const menuBtns = document.querySelectorAll('.menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const projectDetailView = document.getElementById('project-detail');
+        const cards = document.querySelectorAll('.card');
+        const backToPortfolioBtn = document.getElementById('back-to-portfolio');
+        const homeLink = document.getElementById('home-link');
+
+        // --- Menu Logic ---
+        function toggleMenu() {
+            mobileMenu.classList.toggle('open');
+            document.body.classList.toggle('overflow-hidden');
+            // Toggle animation class on all hamburger buttons
+            menuBtns.forEach(btn => btn.classList.toggle('open'));
+        }
+
+        menuBtns.forEach(btn => btn.addEventListener('click', toggleMenu));
+        closeMenuBtn.addEventListener('click', toggleMenu);
+
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (projectDetailView.classList.contains('visible')) {
+                hideProjectDetail();
+            }
+            // Close menu if it's open
+            if (mobileMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+        });
+
+        // --- Project Detail View Logic ---
+        function showProjectDetail(data) {
+            document.getElementById('detail-category').textContent = data.category;
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-img').src = data.img;
+            document.getElementById('detail-client').textContent = data.client;
+            document.getElementById('detail-role').textContent = data.role;
+            document.getElementById('detail-brief-title').textContent = data.briefTitle;
+            document.getElementById('detail-brief-text').textContent = data.briefText;
+            document.body.classList.add('detail-view-active');
+            projectDetailView.classList.add('visible');
+            window.scrollTo(0, 0);
+        }
+
+        function hideProjectDetail() {
+            document.body.classList.remove('detail-view-active');
+            projectDetailView.classList.remove('visible');
+        }
+
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const data = {
+                    category: card.dataset.category, title: card.dataset.title,
+                    img: card.dataset.img, client: card.dataset.client,
+                    role: card.dataset.role, briefTitle: card.dataset.briefTitle,
+                    briefText: card.dataset.briefText,
+                };
+                showProjectDetail(data);
+            });
+        });
+        backToPortfolioBtn.addEventListener('click', hideProjectDetail);
+
+        // --- Three.js Background Animation ---
+        let scene, camera, renderer, solidObject;
+        const clock = new THREE.Clock();
+        const vertexShader=`uniform float uTime;uniform float uAmplitude;uniform float uFrequency;varying vec2 vUv;varying float vNoise;float random(vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}
+        float noise(vec2 st){vec2 i=floor(st);vec2 f=fract(st);float a=random(i);float b=random(i+vec2(1.0,0.0));float c=random(i+vec2(0.0,1.0));float d=random(i+vec2(1.0,1.0));vec2 u=f*f*(3.0-2.0*f);return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;}
+        void main(){vUv=uv;float time=uTime*0.2;vec3 pos=position;float displacement=noise(pos.xy*uFrequency+time)*uAmplitude;displacement+=noise(pos.yz*uFrequency+time)*uAmplitude;vNoise=displacement;pos+=normal*displacement;gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.0);}`;
+        const fragmentShader=`varying vec2 vUv;varying float vNoise;uniform vec3 uColorA;uniform vec3 uColorB;void main(){float intensity=smoothstep(0.0,0.2,vNoise);vec3 color=mix(uColorA,uColorB,intensity);gl_FragColor=vec4(color,1.0);}`;
+
+        function init(){scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);camera.position.z=1.5;const canvas=document.getElementById('bg-canvas');renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});renderer.setSize(window.innerWidth,window.innerHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));const geometry=new THREE.IcosahedronGeometry(1,64);const material=new THREE.ShaderMaterial({vertexShader,fragmentShader,uniforms:{uTime:{value:0},uAmplitude:{value:0.15},uFrequency:{value:1.5},uColorA:{value:new THREE.Color('#0a0a12')},uColorB:{value:new THREE.Color('#2a3a5e')}}});solidObject=new THREE.Mesh(geometry,material);scene.add(solidObject);window.addEventListener('resize',onWindowResize);}
+        function onWindowResize(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);}
+        function animate(){const elapsedTime=clock.getElapsedTime();if(solidObject){solidObject.material.uniforms.uTime.value=elapsedTime;solidObject.rotation.y=elapsedTime*0.05;solidObject.rotation.x=elapsedTime*0.05;}requestAnimationFrame(animate);renderer.render(scene,camera);}
+        init();animate();
+    </script>
+</body>
+</html>
+
+
