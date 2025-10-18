@@ -12,6 +12,7 @@
             color: #E0E0E0;
             background-color: #0A0A12;
             overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
         }
         #bg-canvas {
             position: fixed;
@@ -21,6 +22,51 @@
             height: 100%;
             z-index: -1;
         }
+        /* New Ripple Cursor */
+        .cursor {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease;
+        }
+        .cursor::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: ripple-effect 1.5s infinite ease-out;
+            transition: all 0.3s ease;
+        }
+        .cursor.hovered {
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+        .cursor.hovered::after {
+            border-color: rgba(255, 255, 255, 0.8);
+            animation-duration: 1s;
+        }
+        @keyframes ripple-effect {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
         .main-title {
             font-size: clamp(2.5rem, 10vw, 4rem); 
             font-weight: 100;
@@ -76,7 +122,7 @@
         }
         .menu-btn {
             width: 28px; height: 22px; position: relative;
-            transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
+            transform: rotate(0deg); transition: .5s ease-in-out;
             -webkit-tap-highlight-color: transparent;
         }
         .menu-btn .bar {
@@ -100,9 +146,28 @@
         #detail-brief-text {
             white-space: pre-line;
         }
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Enhanced Link Hovers */
+        header a, #mobile-menu a, #mobile-menu footer a {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        header a:hover, #mobile-menu a:hover, #mobile-menu footer a:hover {
+            transform: translateY(-3px);
+            color: #a5b4fc; /* light indigo */
+        }
     </style>
 </head>
 <body class="antialiased">
+    <div class="cursor"></div>
     <canvas id="bg-canvas"></canvas>
 
     <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
@@ -117,15 +182,15 @@
 
         <div id="portfolio-grid">
             <main class="py-16">
-                <h1 class="main-title">ADEMIANDO</h1>
-                <p class="subtitle mt-2">
+                <h1 class="main-title reveal">ADEMIANDO</h1>
+                <p class="subtitle mt-2 reveal">
                     <span>PROJECTS</span><span class="mx-2 text-gray-600">|</span>
                     <span>COLLABORATIONS</span><span class="mx-2 text-gray-600">|</span>
                     <span>EXPLORATIONS</span>
                 </p>
 
-                <div class="mt-20 max-w-2xl mx-auto space-y-8">
-                    <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none" 
+                <div class="mt-20 max-w-2xl mx-auto space-y-8" style="perspective: 1000px;">
+                    <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal" 
                        data-category="WEB_APPLICATION | DASHBOARD" 
                        data-title="Project OmniFolio (v26)"
                        data-img="assets/assets1.jpg"
@@ -145,7 +210,7 @@ Key features include:
 - In-Depth Asset Analysis: Each asset has a detail modal that integrates a full TradingView widget for in-depth technical analysis.">
                         <img src="assets/assets1.jpg" alt="Project OmniFolio" class="w-full h-full object-cover card-image">
                     </a>
-                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
                        data-category="API | BACKEND" 
                        data-title="Project FinTrack API"
                        data-img="assets/assets2.jpg"
@@ -155,7 +220,7 @@ Key features include:
                        data-brief-text="This is a placeholder description for the FinTrack API project. It involves creating a robust backend service for financial data aggregation and analysis.">
                         <img src="assets/assets2.jpg" alt="Project FinTrack API" class="w-full h-full object-cover card-image">
                     </a>
-                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
                        data-category="AI | GENERATIVE TEXT" 
                        data-title="Project Housel Philosophy (EssayGen)"
                        data-img="assets/assets3.jpg"
@@ -214,17 +279,17 @@ Key features include:
                 </div>
             </header>
             <nav class="flex-grow flex flex-col items-center justify-center space-y-8 -mt-10">
-                <a href="#" id="home-link" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Home</a>
-                <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Service</a>
-                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Art</a>
-                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Info</a>
-                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Doc</a>
+                <a href="#" id="home-link" class="text-4xl font-bold text-white">Home</a>
+                <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white">Service</a>
+                <a href="#" class="text-4xl font-bold text-white">Art</a>
+                <a href="#" class="text-4xl font-bold text-white">Info</a>
+                <a href="#" class="text-4xl font-bold text-white">Doc</a>
             </nav>
             <footer class="flex justify-center items-center space-x-8">
-                <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors">
+                <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
                     <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
                 </a>
-                <a href="https://instagram.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white hover:text-gray-300 transition-colors">
+                <a href="https://instagram.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
                     <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.012 3.584-.07 4.85c-.148 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.85s.012-3.584.07-4.85C2.447 3.896 3.964 2.353 7.15 2.225c1.265-.058 1.644-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998zM16.965 6.57a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" /></svg>
                 </a>
             </footer>
@@ -242,6 +307,19 @@ Key features include:
         const cards = document.querySelectorAll('.card');
         const backToPortfolioBtn = document.getElementById('back-to-portfolio');
         const homeLink = document.getElementById('home-link');
+        const cursor = document.querySelector('.cursor');
+
+        // Custom Cursor Logic
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+        });
+        
+        const interactiveElements = document.querySelectorAll('a, button, .menu-btn-wrapper');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
 
         function toggleMenu() {
             const isOpen = mobileMenu.classList.toggle('open');
@@ -304,8 +382,33 @@ Key features include:
                 };
                 showProjectDetail(data);
             });
+
+            card.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = e.clientX - left - width / 2;
+                const y = e.clientY - top - height / 2;
+                const rotateX = (y / height) * -15;
+                const rotateY = (x / width) * 15;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                card.style.transition = 'transform 0.1s ease-out';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+                card.style.transition = 'transform 0.5s ease-in-out';
+            });
         });
         backToPortfolioBtn.addEventListener('click', hideProjectDetail);
+        
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => observer.observe(el));
+
 
         // --- WebGL Background Logic ---
         let scene, camera, renderer;
@@ -338,9 +441,7 @@ Key features include:
             camera.position.z = 7;
             const geometry = new THREE.BoxGeometry(0.7, 5, 0.7);
             const material = new THREE.MeshStandardMaterial({
-                color: 0x111827,
-                metalness: 0.95,
-                roughness: 0.3,
+                color: 0x111827, metalness: 0.95, roughness: 0.3,
             });
             const monolith = new THREE.Mesh(geometry, material);
             scene.add(monolith);
@@ -369,9 +470,7 @@ Key features include:
             scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
             const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
             const material = new THREE.MeshStandardMaterial({
-                color: 0x030712,
-                metalness: 0.8,
-                roughness: 0.6
+                color: 0x030712, metalness: 0.8, roughness: 0.6
             });
             const plane = new THREE.Mesh(geometry, material);
             plane.rotation.x = -Math.PI / 2;
@@ -379,11 +478,11 @@ Key features include:
             
             const originalPositions = new Float32Array(geometry.attributes.position.array);
 
-            const light1 = new THREE.PointLight(0x5b21b6, 3, 15); // Deeper Violet
+            const light1 = new THREE.PointLight(0x5b21b6, 3, 15);
             light1.position.set(-8, 2, 0);
             scene.add(light1);
 
-            const light2 = new THREE.PointLight(0x155e75, 3, 15); // Deeper Cyan
+            const light2 = new THREE.PointLight(0x155e75, 3, 15);
             light2.position.set(8, 2, 0);
             scene.add(light2);
 
@@ -414,11 +513,7 @@ Key features include:
 
             const createRing = (radius) => {
                 const geometry = new THREE.TorusGeometry(radius, 0.025, 24, 128);
-                const material = new THREE.MeshStandardMaterial({
-                    color: 0x6b7280,
-                    metalness: 1.0,
-                    roughness: 0.2
-                });
+                const material = new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 });
                 const ring = new THREE.Mesh(geometry, material);
                 ring.rotation.x = Math.PI / 2;
                 return ring;
@@ -447,9 +542,9 @@ Key features include:
 
         // --- Initialize ---
         function animate() {
+            requestAnimationFrame(animate);
             animationLoop();
             renderer.render(scene, camera);
-            requestAnimationFrame(animate);
         }
 
         initBaseScene();
