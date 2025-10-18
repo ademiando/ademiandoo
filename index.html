@@ -215,7 +215,7 @@ Key features include:
             </header>
             <nav class="flex-grow flex flex-col items-center justify-center space-y-8 -mt-10">
                 <a href="#" id="home-link" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Home</a>
-                <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Service</a>
+                <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Service</a>
                 <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Art</a>
                 <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Info</a>
                 <a href="#" class="text-4xl font-bold text-white hover:text-gray-300 transition-colors">Doc</a>
@@ -332,40 +332,46 @@ Key features include:
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // SCENE 1: Monolith Artifact
+        // SCENE 1: Monolith Artifact (Enhanced)
         function createMonolithScene() {
-            camera.position.z = 5;
-            const geometry = new THREE.BoxGeometry(0.5, 4, 0.5);
+            scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
+            camera.position.z = 7;
+            const geometry = new THREE.BoxGeometry(0.7, 5, 0.7);
             const material = new THREE.MeshStandardMaterial({
-                color: 0x111827, // Gray 900
-                metalness: 0.9,
+                color: 0x111827,
+                metalness: 0.95,
                 roughness: 0.3,
             });
             const monolith = new THREE.Mesh(geometry, material);
             scene.add(monolith);
 
-            const spotlight = new THREE.SpotLight(0xffffff, 4, 20, Math.PI * 0.1, 0.5);
+            const spotlight = new THREE.SpotLight(0xffffff, 5, 30, Math.PI * 0.1, 0.4, 1.5);
             spotlight.position.set(0, 5, 5);
             scene.add(spotlight);
+            
+            const ambient = new THREE.AmbientLight(0xffffff, 0.05);
+            scene.add(ambient);
 
             animationLoop = () => {
                 const t = clock.getElapsedTime();
-                monolith.rotation.y = t * 0.1;
-                spotlight.position.x = Math.sin(t * 0.2) * 4;
-                spotlight.position.z = Math.cos(t * 0.2) * 4;
+                monolith.rotation.y = t * 0.08;
+                monolith.rotation.x = t * 0.02;
+                spotlight.position.x = Math.sin(t * 0.3) * 5;
+                spotlight.position.z = Math.cos(t * 0.3) * 5;
                 spotlight.target = monolith;
             };
         }
 
-        // SCENE 2: Tectonic Waves
+        // SCENE 2: Tectonic Waves (Enhanced)
         function createTectonicScene() {
-            camera.position.set(0, 3, 5);
+            camera.position.set(0, 4, 6);
             camera.lookAt(0, 0, 0);
-            const geometry = new THREE.PlaneGeometry(20, 20, 100, 100);
+            scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
+            const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
             const material = new THREE.MeshStandardMaterial({
-                color: 0x030712, // Gray 950
-                metalness: 0.5,
-                roughness: 0.8
+                color: 0x030712,
+                metalness: 0.8,
+                roughness: 0.6
             });
             const plane = new THREE.Mesh(geometry, material);
             plane.rotation.x = -Math.PI / 2;
@@ -373,12 +379,12 @@ Key features include:
             
             const originalPositions = new Float32Array(geometry.attributes.position.array);
 
-            const light1 = new THREE.PointLight(0x4338ca, 2, 10); // Indigo 700
-            light1.position.set(-5, 1, 0);
+            const light1 = new THREE.PointLight(0x5b21b6, 3, 15); // Deeper Violet
+            light1.position.set(-8, 2, 0);
             scene.add(light1);
 
-            const light2 = new THREE.PointLight(0x164e63, 2, 10); // Cyan 800
-            light2.position.set(5, 1, 0);
+            const light2 = new THREE.PointLight(0x155e75, 3, 15); // Deeper Cyan
+            light2.position.set(8, 2, 0);
             scene.add(light2);
 
             animationLoop = () => {
@@ -387,55 +393,55 @@ Key features include:
                 for (let i = 0; i < positions.length / 3; i++) {
                     const x = originalPositions[i * 3];
                     const y = originalPositions[i * 3 + 1];
-                    const wave1 = Math.sin(x * 0.5 + t * 0.3) * 0.2;
-                    const wave2 = Math.sin(y * 0.3 + t * 0.2) * 0.2;
-                    positions[i * 3 + 2] = wave1 + wave2; // Update Z-position
+                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4;
+                    const wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
+                    positions[i * 3 + 2] = wave1 + wave2;
                 }
                 geometry.attributes.position.needsUpdate = true;
                 
-                light1.position.x = Math.sin(t * 0.4) * 5;
-                light2.position.x = Math.cos(t * 0.3) * -5;
+                light1.position.x = Math.sin(t * 0.5) * 8;
+                light2.position.x = Math.cos(t * 0.3) * -8;
             };
         }
         
-        // SCENE 3: Cosmic Rings
+        // SCENE 3: Cosmic Rings (Enhanced)
         function createRingsScene() {
-            camera.position.set(0, 2.5, 6);
+            camera.position.set(0, 3, 7);
             camera.lookAt(0, 0, 0);
             
             const ringsGroup = new THREE.Group();
             scene.add(ringsGroup);
 
             const createRing = (radius) => {
-                const geometry = new THREE.TorusGeometry(radius, 0.02, 16, 100);
+                const geometry = new THREE.TorusGeometry(radius, 0.025, 24, 128);
                 const material = new THREE.MeshStandardMaterial({
-                    color: 0x4b5563, // Gray 600
+                    color: 0x6b7280,
                     metalness: 1.0,
-                    roughness: 0.4
+                    roughness: 0.2
                 });
                 const ring = new THREE.Mesh(geometry, material);
                 ring.rotation.x = Math.PI / 2;
                 return ring;
             };
 
-            const ring1 = createRing(2);
-            const ring2 = createRing(2.5);
-            const ring3 = createRing(3);
-            ringsGroup.add(ring1, ring2, ring3);
+            for(let i = 0; i < 5; i++) {
+                ringsGroup.add(createRing(2.5 + i * 0.5));
+            }
 
-            const keyLight = new THREE.SpotLight(0xffffff, 5, 20, Math.PI * 0.2, 0.8);
-            keyLight.position.set(0, 5, 3);
+            const keyLight = new THREE.SpotLight(0xffffff, 8, 30, Math.PI * 0.1, 0.2, 2);
+            keyLight.position.set(0, 8, 4);
             scene.add(keyLight);
             
-            const ambient = new THREE.AmbientLight(0xffffff, 0.05);
+            const ambient = new THREE.AmbientLight(0xffffff, 0.1);
             scene.add(ambient);
 
             animationLoop = () => {
                 const t = clock.getElapsedTime();
-                ring1.rotation.z = t * 0.1;
-                ring2.rotation.z = t * -0.08;
-                ring3.rotation.z = t * 0.05;
-                ringsGroup.rotation.y = t * 0.05;
+                ringsGroup.children.forEach((ring, index) => {
+                    ring.rotation.z = t * (0.1 - index * 0.02) * (index % 2 === 0 ? 1 : -1);
+                });
+                ringsGroup.rotation.y = t * 0.04;
+                ringsGroup.rotation.z = t * 0.02;
             };
         }
 
@@ -454,5 +460,4 @@ Key features include:
     </script>
 </body>
 </html>
-
 
