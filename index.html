@@ -176,7 +176,7 @@ Key features include:
     </div>
     
     <div id="project-detail">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
             <header class="flex justify-between items-center">
                  <button id="back-to-portfolio" class="p-2 text-gray-400 hover:text-white transition-colors">
                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
@@ -191,7 +191,13 @@ Key features include:
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
-            <div class="mt-12 overflow-hidden rounded-none"><img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover"></div>
+            <div class="mt-12 overflow-hidden rounded-none">
+                <img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover">
+            </div>
+            
+            <!-- New Icon Link Container -->
+            <div id="detail-icon-link-container" class="text-center mt-4"></div>
+
             <div class="mt-8 px-2">
                 <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
                 <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
@@ -200,7 +206,6 @@ Key features include:
             <div class="mt-12 max-w-2xl mx-auto text-left">
                 <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
                 <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
-                <div id="detail-link-container" class="mt-10 text-center"></div>
             </div>
         </div>
     </div>
@@ -274,17 +279,17 @@ Key features include:
             document.getElementById('detail-brief-title').textContent = data.briefTitle;
             document.getElementById('detail-brief-text').textContent = data.briefText;
             
-            const linkContainer = document.getElementById('detail-link-container');
-            linkContainer.innerHTML = ''; // Clear previous button before adding a new one
+            const iconLinkContainer = document.getElementById('detail-icon-link-container');
+            iconLinkContainer.innerHTML = ''; // Clear previous icon
 
             if (data.link) {
-                const linkButton = document.createElement('a');
-                linkButton.href = data.link;
-                linkButton.target = '_blank';
-                linkButton.rel = 'noopener noreferrer';
-                linkButton.className = 'inline-block bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-8 transition-colors duration-300 rounded-none';
-                linkButton.textContent = 'Visit Project';
-                linkContainer.appendChild(linkButton);
+                const linkIcon = document.createElement('a');
+                linkIcon.href = data.link;
+                linkIcon.target = '_blank';
+                linkIcon.rel = 'noopener noreferrer';
+                linkIcon.className = 'inline-block text-gray-400 hover:text-white transition-colors duration-300';
+                linkIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                iconLinkContainer.appendChild(linkIcon);
             }
 
             document.body.classList.add('detail-view-active');
