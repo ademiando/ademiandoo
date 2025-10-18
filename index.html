@@ -140,14 +140,27 @@
             opacity: 1; 
             visibility: visible;
         }
-        #project-detail {
+        #project-detail, #password-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0A0A12; z-index: 100; overflow-y: auto;
+            z-index: 100;
             opacity: 0; visibility: hidden;
             transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        #project-detail {
+            background-color: #0A0A12; 
+            overflow-y: auto;
             transform: translateY(20px);
         }
-        #project-detail.visible {
+        #password-page {
+             background-color: rgba(10, 10, 18, 0.7);
+             backdrop-filter: blur(8px);
+             -webkit-backdrop-filter: blur(8px);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+        }
+
+        #project-detail.visible, #password-page.visible {
             opacity: 1; visibility: visible; transform: translateY(0);
         }
         #portfolio-grid {
@@ -202,12 +215,21 @@
             transform: translateY(-3px);
             color: #a5b4fc;
         }
-        #back-to-portfolio, #detail-icon-link-container a {
+        #back-to-portfolio, #detail-icon-link-container a, #back-from-password {
             transition: transform 0.3s ease, color 0.3s ease;
         }
-        #back-to-portfolio:hover, #detail-icon-link-container a:hover {
+        #back-to-portfolio:hover, #detail-icon-link-container a:hover, #back-from-password:hover {
             transform: scale(1.15);
             color: #fff;
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
         }
     </style>
 </head>
@@ -316,6 +338,19 @@ Key features include:
         </div>
     </div>
 
+    <div id="password-page">
+        <div class="bg-gray-900 p-8 shadow-2xl w-full max-w-sm text-center border border-gray-700">
+            <h2 class="text-xl font-light text-white tracking-wider">ACCESS RESTRICTED</h2>
+            <p class="text-gray-400 text-sm mt-2">Enter password to view document.</p>
+            <form id="password-form" class="mt-6">
+                <input type="password" id="password-input" class="w-full bg-gray-800 border border-gray-600 text-white text-center p-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="************">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3 mt-4 transition-colors">AUTHENTICATE</button>
+            </form>
+            <p id="password-error" class="text-red-500 text-sm mt-4 h-5"></p>
+            <button id="back-from-password" class="text-gray-500 hover:text-white text-sm mt-6">← Back to Portfolio</button>
+        </div>
+    </div>
+
     <div id="mobile-menu" class="fixed inset-0 z-[200]">
         <div class="relative w-full h-full flex flex-col p-6 sm:p-8">
             <header class="flex justify-end items-center">
@@ -330,7 +365,7 @@ Key features include:
                 <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white">Service</a>
                 <a href="#" class="text-4xl font-bold text-white">Art</a>
                 <a href="#" class="text-4xl font-bold text-white">Info</a>
-                <a href="#" class="text-4xl font-bold text-white">Doc</a>
+                <a href="#" id="doc-link" class="text-4xl font-bold text-white">Doc</a>
             </nav>
             <footer class="flex justify-center items-center space-x-8">
                 <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
@@ -355,6 +390,11 @@ Key features include:
         const backToPortfolioBtn = document.getElementById('back-to-portfolio');
         const homeLink = document.getElementById('home-link');
         const cursor = document.querySelector('.cursor');
+        const docLink = document.getElementById('doc-link');
+        const passwordPage = document.getElementById('password-page');
+        const passwordForm = document.getElementById('password-form');
+        const passwordError = document.getElementById('password-error');
+        const backFromPasswordBtn = document.getElementById('back-from-password');
 
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
@@ -416,8 +456,9 @@ Key features include:
 
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
-            if (projectDetailView.classList.contains('visible')) {
+            if (projectDetailView.classList.contains('visible') || passwordPage.classList.contains('visible')) {
                 hideProjectDetail();
+                hidePasswordPage();
             }
             if (mobileMenu.classList.contains('open')) {
                 toggleMenu();
@@ -459,6 +500,38 @@ Key features include:
             document.body.classList.remove('detail-view-active');
             projectDetailView.classList.remove('visible');
         }
+        
+        function showPasswordPage() {
+            document.body.classList.add('detail-view-active');
+            passwordPage.classList.add('visible');
+        }
+
+        function hidePasswordPage() {
+            document.body.classList.remove('detail-view-active');
+            passwordPage.classList.remove('visible');
+            passwordError.textContent = '';
+            passwordForm.reset();
+        }
+
+        docLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (mobileMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+            setTimeout(showPasswordPage, 300);
+        });
+        
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            passwordError.textContent = 'ACCESS DENIED: INCORRECT PASSWORD';
+            const formContainer = passwordPage.querySelector('div');
+            formContainer.classList.add('shake');
+            setTimeout(() => {
+                formContainer.classList.remove('shake');
+            }, 500);
+        });
+        
+        backFromPasswordBtn.addEventListener('click', hidePasswordPage);
 
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
