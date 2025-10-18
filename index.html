@@ -49,7 +49,7 @@
             z-index: 2000;
             opacity: 1;
             visibility: visible;
-            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out; /* Faster fade out */
             pointer-events: none;
             overflow: hidden;
         }
@@ -296,7 +296,7 @@ Key features include:
                        data-category="API | BACKEND" 
                        data-title="Project FinTrack API"
                        data-img="assets/assets2.jpg"
-                       data-client="JUNGLE STUDIOS" 
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="BACKEND DEVELOPER"
                        data-link="/project2"
                        data-brief-title="Financial Tracking API Service"
@@ -307,7 +307,7 @@ Key features include:
                        data-category="AI | GENERATIVE TEXT" 
                        data-title="Project Housel Philosophy (EssayGen)"
                        data-img="assets/assets3.jpg"
-                       data-client="ACADEMIC RESEARCH" 
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="AI ENGINEER | RESEARCHER"
                        data-link="/project3"
                        data-brief-title="AI-Powered Philosophy Essay Generator"
@@ -474,9 +474,9 @@ Key features include:
             transitionOverlay.innerHTML = ''; // Clear previous
             
             const lightSweepLeft = document.createElement('div');
-            lightSweepLeft.style.cssText = 'position: absolute; top: 50%; right: 50%; width: 50%; height: 1px; background: linear-gradient(to left, white, transparent); transform-origin: right; animation: sweep-left 0.6s ease-in-out;';
+            lightSweepLeft.style.cssText = 'position: absolute; top: 50%; right: 50%; width: 50%; height: 1px; background: linear-gradient(to left, white, transparent); transform-origin: right; animation: sweep-left 0.4s ease-in-out;';
             const lightSweepRight = document.createElement('div');
-            lightSweepRight.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(to right, white, transparent); transform-origin: left; animation: sweep-right 0.6s ease-in-out;';
+            lightSweepRight.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(to right, white, transparent); transform-origin: left; animation: sweep-right 0.4s ease-in-out;';
             transitionOverlay.appendChild(lightSweepLeft);
             transitionOverlay.appendChild(lightSweepRight);
 
@@ -485,7 +485,7 @@ Key features include:
                 setTimeout(() => {
                     transitionOverlay.classList.add('out');
                 }, 50);
-            }, 600);
+            }, 400);
         }
 
         homeLink.addEventListener('click', (e) => {
@@ -616,9 +616,7 @@ Key features include:
         revealElements.forEach(el => observer.observe(el));
         
         window.addEventListener('load', () => {
-             setTimeout(() => {
-                transitionOverlay.classList.add('out');
-             }, 600);
+            performTransition(() => {}); // Run empty action to just show transition
         });
 
 
