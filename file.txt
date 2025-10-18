@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ademiando | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #E0E0E0;
+            background-color: #0A0A12;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        /* Enhanced Water Ripple Cursor with a visible dot */
+        .cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            /* This is the central dot */
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+        }
+        .cursor.visible {
+            opacity: 1;
+        }
+        .ripple {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%); /* Center ripple inside the dot */
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid white;
+            animation: water-ripple-effect 1.2s ease-out forwards;
+            opacity: 0; /* Animation will handle opacity */
+        }
+        .cursor.hovered {
+            transform: translate(-50%, -50%) scale(1.8);
+        }
+        .cursor.hovered .ripple {
+             border-color: #a5b4fc;
+             animation-duration: 1s;
+        }
+        @keyframes water-ripple-effect {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.5);
+                opacity: 0;
+            }
+        }
+        body.is-touch .cursor {
+            display: none;
+        }
+
+        .main-title {
+            font-size: clamp(2.5rem, 10vw, 4rem); 
+            font-weight: 100;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+        .subtitle {
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.25em;
+            font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+            text-align: center;
+        }
+        .card-image {
+            transition: transform 0.3s ease-in-out;
+        }
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        #mobile-menu {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            opacity: 0; 
+            visibility: hidden; 
+            background-color: rgba(10, 10, 18, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        #mobile-menu.open {
+            opacity: 1; 
+            visibility: visible;
+        }
+        #project-detail {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0A0A12; z-index: 100; overflow-y: auto;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        #project-detail.visible {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        #portfolio-grid {
+             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        body.detail-view-active #portfolio-grid {
+            opacity: 0; transform: scale(0.95); pointer-events: none;
+        }
+
+        .menu-btn-wrapper {
+            padding: 0.5rem; 
+        }
+        .menu-btn {
+            width: 28px; height: 22px; position: relative;
+            transform: rotate(0deg); transition: .5s ease-in-out;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-btn .bar {
+            display: block; position: absolute; height: 3px; width: 100%;
+            background: #fff; border-radius: 3px; opacity: 1; left: 0;
+            transform: rotate(0deg); transition: .25s ease-in-out;
+        }
+        .menu-btn .bar:nth-child(1) { top: 0px; }
+        .menu-btn .bar:nth-child(2) { top: 9px; }
+        .menu-btn .bar:nth-child(3) { top: 18px; }
+
+        .menu-btn.open .bar:nth-child(1) {
+            top: 9px; transform: rotate(135deg);
+        }
+        .menu-btn.open .bar:nth-child(2) {
+            opacity: 0; left: -30px;
+        }
+        .menu-btn.open .bar:nth-child(3) {
+            top: 9px; transform: rotate(-135deg);
+        }
+        #detail-brief-text {
+            white-space: pre-line;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        header a, #mobile-menu a, #mobile-menu footer a {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        header a:hover, #mobile-menu a:hover, #mobile-menu footer a:hover {
+            transform: translateY(-3px);
+            color: #a5b4fc;
+        }
+        #back-to-portfolio, #detail-icon-link-container a {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        #back-to-portfolio:hover, #detail-icon-link-container a:hover {
+            transform: scale(1.15);
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="cursor"></div>
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
+        <header id="main-header" class="flex justify-between items-center py-6">
+            <a href="#" class="text-2xl font-bold tracking-wider">A.</a>
+            <div class="menu-btn-wrapper z-50">
+                <div class="menu-btn">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                </div>
+            </div>
+        </header>
+
+        <div id="portfolio-grid">
+            <main class="py-16">
+                <h1 class="main-title reveal">ADEMIANDO</h1>
+                <p class="subtitle mt-2 reveal">
+                    <span>IDEAS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>EXPERIMENTS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>EXPLORATIONS</span>
+                </p>
+
+                <div class="mt-20 max-w-2xl mx-auto space-y-8" style="perspective: 1000px;">
+                    <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal" 
+                       data-category="WEB_APPLICATION | DASHBOARD" 
+                       data-title="Project OmniFolio (v26)"
+                       data-img="assets/assets1.jpg"
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
+                       data-role="LEAD DEVELOPER | UI/UX DESIGNER"
+                       data-link="https://bloomboard-two.vercel.app/dashboard"
+                       data-brief-title="An All-in-One Financial Dashboard"
+                       data-brief-text="This project is a comprehensive portfolio dashboard application designed to track diverse asset classes within a single, cohesive interface. Built as a single-page application (SPA) using React, it serves as a sophisticated personal wealth management tool.
+
+At its core is a robust transaction-based tracking system. Every buy, sell, deposit, or withdrawal is logged, and the application dynamically calculates current asset holdings, average price, and realized/unrealized P&L.
+
+Key features include:
+- Multi-Asset Tracking: Manages not only Stocks (using real-time data from Finnhub) and Crypto (from CoinGecko), but also includes full functionality for tracking Non-Liquid Assets (like property or collectibles) with estimated year-over-year (YOY) gains.
+- Performance Analytics: Calculates and visualizes detailed trade metrics, including win rate, average profit/loss, and maximum profit/loss.
+- Dynamic Data Visualization: Features a portfolio equity curve, asset allocation breakdowns (by sector and individual asset), and price sparklines for each holding.
+- Full Portfolio Management: Users can add/withdraw balances, import/export their entire transaction history via CSV files, and toggle the display currency between IDR and USD.
+- In-Depth Asset Analysis: Each asset has a detail modal that integrates a full TradingView widget for in-depth technical analysis.">
+                        <img src="assets/assets1.jpg" alt="Project OmniFolio" class="w-full h-full object-cover card-image">
+                    </a>
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
+                       data-category="API | BACKEND" 
+                       data-title="Project FinTrack API"
+                       data-img="assets/assets2.jpg"
+                       data-client="JUNGLE STUDIOS" 
+                       data-role="BACKEND DEVELOPER"
+                       data-brief-title="Financial Tracking API Service"
+                       data-brief-text="This is a placeholder description for the FinTrack API project. It involves creating a robust backend service for financial data aggregation and analysis.">
+                        <img src="assets/assets2.jpg" alt="Project FinTrack API" class="w-full h-full object-cover card-image">
+                    </a>
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
+                       data-category="AI | GENERATIVE TEXT" 
+                       data-title="Project Housel Philosophy (EssayGen)"
+                       data-img="assets/assets3.jpg"
+                       data-client="ACADEMIC RESEARCH" 
+                       data-role="AI ENGINEER | RESEARCHER"
+                       data-brief-title="AI-Powered Philosophy Essay Generator"
+                       data-brief-text="This is a placeholder description for the Housel Philosophy project. It focuses on using generative AI models to create philosophical essays and arguments.">
+                        <img src="assets/assets3.jpg" alt="Project Housel Philosophy" class="w-full h-full object-cover card-image">
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="project-detail">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
+            <header class="flex justify-between items-center">
+                 <button id="back-to-portfolio" class="p-2 text-gray-400">
+                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                 </button>
+                 <div class="menu-btn-wrapper z-50">
+                    <div class="menu-btn">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </div>
+            </header>
+            <div class="mt-16 text-center">
+                <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
+                <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
+            </div>
+            <div class="mt-12 overflow-hidden rounded-none">
+                <img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover">
+            </div>
+
+            <div id="detail-icon-link-container" class="text-center mt-4"></div>
+
+            <div class="mt-8 px-2">
+                <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
+                <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
+            </div>
+            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500">[ BRIEF ]</div>
+            <div class="mt-12 max-w-2xl mx-auto text-left">
+                <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
+                <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="fixed inset-0 z-[200]">
+        <div class="relative w-full h-full flex flex-col p-6 sm:p-8">
+            <header class="flex justify-end items-center">
+                 <div class="menu-btn-wrapper">
+                    <div class="menu-btn open">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                </div>
+            </header>
+            <nav class="flex-grow flex flex-col items-center justify-center space-y-8 -mt-10">
+                <a href="#" id="home-link" class="text-4xl font-bold text-white">Home</a>
+                <a href="https://ademiando.github.io/ademiando.com/" target="_blank" rel="noopener noreferrer" class="text-4xl font-bold text-white">Service</a>
+                <a href="#" class="text-4xl font-bold text-white">Art</a>
+                <a href="#" class="text-4xl font-bold text-white">Info</a>
+                <a href="#" class="text-4xl font-bold text-white">Doc</a>
+            </nav>
+            <footer class="flex justify-center items-center space-x-8">
+                <a href="https://github.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.031-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.03 1.595 1.03 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
+                </a>
+                <a href="https://instagram.com/ademiando" target="_blank" rel="noopener noreferrer" class="text-white">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.012 3.584-.07 4.85c-.148 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.85s.012-3.584.07-4.85C2.447 3.896 3.964 2.353 7.15 2.225c1.265-.058 1.644-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.947s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-7.998 3.999 3.999 0 010 7.998zM16.965 6.57a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" /></svg>
+                </a>
+            </footer>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js';
+
+        // --- UI Logic ---
+        const menuBtnWrappers = document.querySelectorAll('.menu-btn-wrapper');
+        const menuBtns = document.querySelectorAll('.menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const projectDetailView = document.getElementById('project-detail');
+        const cards = document.querySelectorAll('.card');
+        const backToPortfolioBtn = document.getElementById('back-to-portfolio');
+        const homeLink = document.getElementById('home-link');
+        const cursor = document.querySelector('.cursor');
+
+        const isTouchDevice = 'ontouchstart' in window;
+        if (isTouchDevice) {
+            document.body.classList.add('is-touch');
+        }
+
+        function createRipple(x, y) {
+            const rippleContainer = document.createElement('div');
+            rippleContainer.style.position = 'fixed';
+            rippleContainer.style.left = `${x}px`;
+            rippleContainer.style.top = `${y}px`;
+            rippleContainer.style.zIndex = '1000';
+            rippleContainer.style.pointerEvents = 'none';
+
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            rippleContainer.appendChild(ripple);
+            document.body.appendChild(rippleContainer);
+
+            setTimeout(() => {
+                rippleContainer.remove();
+            }, 1200);
+        }
+
+        if (!isTouchDevice) {
+            cursor.classList.add('visible');
+            window.addEventListener('mousemove', (e) => {
+                cursor.style.left = `${e.clientX}px`;
+                cursor.style.top = `${e.clientY}px`;
+            });
+            let rippleInterval = setInterval(() => {
+                 if (!cursor.matches('.hovered')) { 
+                    const newRipple = document.createElement('div');
+                    newRipple.className = 'ripple';
+                    cursor.appendChild(newRipple);
+                    setTimeout(() => newRipple.remove(), 1200);
+                 }
+            }, 800);
+        } else {
+            document.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                createRipple(touch.clientX, touch.clientY);
+            }, {passive: true});
+        }
+
+        const interactiveElements = document.querySelectorAll('a, button, .menu-btn-wrapper');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (!isTouchDevice) {
+                    cursor.classList.add('hovered');
+                    const newRipple = document.createElement('div');
+                    newRipple.className = 'ripple';
+                    cursor.appendChild(newRipple);
+                    setTimeout(() => newRipple.remove(), 1200);
+                }
+            });
+            el.addEventListener('mouseleave', () => !isTouchDevice && cursor.classList.remove('hovered'));
+        });
+
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.toggle('open');
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+            menuBtns.forEach(btn => btn.classList.toggle('open', isOpen));
+        }
+
+        menuBtnWrappers.forEach(wrapper => wrapper.addEventListener('click', toggleMenu));
+
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (projectDetailView.classList.contains('visible')) {
+                hideProjectDetail();
+            }
+            if (mobileMenu.classList.contains('open')) {
+                toggleMenu();
+            }
+        });
+
+        function showProjectDetail(data) {
+            document.getElementById('detail-category').textContent = data.category;
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-img').src = data.img;
+            document.getElementById('detail-client').textContent = data.client;
+            document.getElementById('detail-role').textContent = data.role;
+            document.getElementById('detail-brief-title').textContent = data.briefTitle;
+            document.getElementById('detail-brief-text').textContent = data.briefText;
+
+            const iconLinkContainer = document.getElementById('detail-icon-link-container');
+            iconLinkContainer.innerHTML = ''; 
+
+            if (data.link) {
+                const linkIcon = document.createElement('a');
+                linkIcon.href = data.link;
+                linkIcon.target = '_blank';
+                linkIcon.rel = 'noopener noreferrer';
+                linkIcon.className = 'inline-block text-gray-400';
+                linkIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                iconLinkContainer.appendChild(linkIcon);
+            }
+
+            document.body.classList.add('detail-view-active');
+            projectDetailView.classList.add('visible');
+            projectDetailView.scrollTo(0, 0);
+        }
+
+        function hideProjectDetail() {
+            document.body.classList.remove('detail-view-active');
+            projectDetailView.classList.remove('visible');
+        }
+
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const data = {
+                    category: card.dataset.category, title: card.dataset.title,
+                    img: card.dataset.img, client: card.dataset.client,
+                    role: card.dataset.role, briefTitle: card.dataset.briefTitle,
+                    briefText: card.dataset.briefText, link: card.dataset.link 
+                };
+                showProjectDetail(data);
+            });
+
+            card.addEventListener('mousemove', (e) => {
+                if(isTouchDevice) return;
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = e.clientX - left - width / 2;
+                const y = e.clientY - top - height / 2;
+                const rotateX = (y / height) * -15;
+                const rotateY = (x / width) * 15;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                card.style.transition = 'transform 0.1s ease-out';
+            });
+            card.addEventListener('mouseleave', () => {
+                 if(isTouchDevice) return;
+                card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+                card.style.transition = 'transform 0.5s ease-in-out';
+            });
+        });
+        backToPortfolioBtn.addEventListener('click', hideProjectDetail);
+
+        const revealElements = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        revealElements.forEach(el => observer.observe(el));
+
+
+        // --- WebGL Background Logic ---
+        let scene, camera, renderer;
+        const clock = new THREE.Clock();
+        let animationLoop = () => {};
+
+        function initBaseScene() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const canvas = document.getElementById('bg-canvas');
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // SCENE 1: Monolith Artifact (Enhanced)
+        function createMonolithScene() {
+            scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
+            camera.position.z = 7;
+            const geometry = new THREE.BoxGeometry(0.7, 5, 0.7);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x111827, metalness: 0.95, roughness: 0.3,
+            });
+            const monolith = new THREE.Mesh(geometry, material);
+            scene.add(monolith);
+
+            const spotlight = new THREE.SpotLight(0xffffff, 5, 30, Math.PI * 0.1, 0.4, 1.5);
+            spotlight.position.set(0, 5, 5);
+            scene.add(spotlight);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.05);
+            scene.add(ambient);
+
+            animationLoop = () => {
+                const t = clock.getElapsedTime();
+                monolith.rotation.y = t * 0.08;
+                monolith.rotation.x = t * 0.02;
+                spotlight.position.x = Math.sin(t * 0.3) * 5;
+                spotlight.position.z = Math.cos(t * 0.3) * 5;
+                spotlight.target = monolith;
+            };
+        }
+
+        // SCENE 2: Tectonic Waves (Enhanced)
+        function createTectonicScene() {
+            camera.position.set(0, 4, 6);
+            camera.lookAt(0, 0, 0);
+            scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
+            const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x030712, metalness: 0.8, roughness: 0.6
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2;
+            scene.add(plane);
+
+            const originalPositions = new Float32Array(geometry.attributes.position.array);
+
+            const light1 = new THREE.PointLight(0x5b21b6, 3, 15);
+            light1.position.set(-8, 2, 0);
+            scene.add(light1);
+
+            const light2 = new THREE.PointLight(0x155e75, 3, 15);
+            light2.position.set(8, 2, 0);
+            scene.add(light2);
+
+            animationLoop = () => {
+                const t = clock.getElapsedTime();
+                const positions = geometry.attributes.position.array;
+                for (let i = 0; i < positions.length / 3; i++) {
+                    const x = originalPositions[i * 3];
+                    const y = originalPositions[i * 3 + 1];
+                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4;
+                    const wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
+                    positions[i * 3 + 2] = wave1 + wave2;
+                }
+                geometry.attributes.position.needsUpdate = true;
+
+                light1.position.x = Math.sin(t * 0.5) * 8;
+                light2.position.x = Math.cos(t * 0.3) * -8;
+            };
+        }
+
+        // SCENE 3: Cosmic Rings (Enhanced)
+        function createRingsScene() {
+            camera.position.set(0, 3, 7);
+            camera.lookAt(0, 0, 0);
+
+            const ringsGroup = new THREE.Group();
+            scene.add(ringsGroup);
+
+            const createRing = (radius) => {
+                const geometry = new THREE.TorusGeometry(radius, 0.025, 24, 128);
+                const material = new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 });
+                const ring = new THREE.Mesh(geometry, material);
+                ring.rotation.x = Math.PI / 2;
+                return ring;
+            };
+
+            for(let i = 0; i < 5; i++) {
+                ringsGroup.add(createRing(2.5 + i * 0.5));
+            }
+
+            const keyLight = new THREE.SpotLight(0xffffff, 8, 30, Math.PI * 0.1, 0.2, 2);
+            keyLight.position.set(0, 8, 4);
+            scene.add(keyLight);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.1);
+            scene.add(ambient);
+
+            animationLoop = () => {
+                const t = clock.getElapsedTime();
+                ringsGroup.children.forEach((ring, index) => {
+                    ring.rotation.z = t * (0.1 - index * 0.02) * (index % 2 === 0 ? 1 : -1);
+                });
+                ringsGroup.rotation.y = t * 0.04;
+                ringsGroup.rotation.z = t * 0.02;
+            };
+        }
+
+        // --- Initialize ---
+        function animate() {
+            requestAnimationFrame(animate);
+            animationLoop();
+            renderer.render(scene, camera);
+        }
+
+        initBaseScene();
+        const scenes = [createMonolithScene, createTectonicScene, createRingsScene];
+        const randomSceneIndex = Math.floor(Math.random() * scenes.length);
+        scenes[randomSceneIndex]();
+        animate();
+    </script>
+</body>
+</html>
