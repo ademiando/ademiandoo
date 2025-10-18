@@ -245,6 +245,20 @@
             border-radius: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        /* Sticky Header Styles */
+        #main-header, #project-detail header {
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            background-color: transparent;
+            transition: background-color 0.4s ease-out, backdrop-filter 0.4s ease-out, box-shadow 0.4s ease-out;
+        }
+        #main-header.scrolled, #project-detail header.scrolled {
+            background-color: rgba(10, 10, 18, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -410,6 +424,8 @@ Key features include:
         const passwordError = document.getElementById('password-error');
         const backFromPasswordBtn = document.getElementById('back-from-password');
         const transitionOverlay = document.getElementById('page-transition-overlay');
+        const mainHeader = document.getElementById('main-header');
+        const detailHeader = projectDetailView.querySelector('header');
 
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
@@ -616,7 +632,24 @@ Key features include:
         revealElements.forEach(el => observer.observe(el));
         
         window.addEventListener('load', () => {
-            performTransition(() => {}); // Run empty action to just show transition
+            performTransition(() => {});
+        });
+        
+        // Sticky header logic
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                mainHeader.classList.add('scrolled');
+            } else {
+                mainHeader.classList.remove('scrolled');
+            }
+        });
+
+        projectDetailView.addEventListener('scroll', () => {
+            if (projectDetailView.scrollTop > 10) {
+                detailHeader.classList.add('scrolled');
+            } else {
+                detailHeader.classList.remove('scrolled');
+            }
         });
 
 
