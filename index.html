@@ -41,7 +41,32 @@
             height: 100%;
             z-index: -1;
         }
-        /* Enhanced Water Ripple Cursor with a visible dot */
+        /* Page Transition Overlay */
+        #page-transition-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #0A0A12;
+            z-index: 2000;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        #page-transition-overlay.out {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        @keyframes sweep-right {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        @keyframes sweep-left {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        
         .cursor {
             position: fixed;
             top: 0;
@@ -51,7 +76,6 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.2s ease;
-            /* This is the central dot */
             width: 8px;
             height: 8px;
             background-color: white;
@@ -64,13 +88,13 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-50%, -50%); /* Center ripple inside the dot */
+            transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
             border-radius: 50%;
             border: 1px solid white;
             animation: water-ripple-effect 1.2s ease-out forwards;
-            opacity: 0; /* Animation will handle opacity */
+            opacity: 0;
         }
         .cursor.hovered {
             transform: translate(-50%, -50%) scale(1.8);
@@ -80,39 +104,27 @@
              animation-duration: 1s;
         }
         @keyframes water-ripple-effect {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(2.5);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
         body.is-touch .cursor {
             display: none;
         }
 
-        /* Title with Continuous Shine Animation */
         .main-title {
             font-size: clamp(2.5rem, 10vw, 4rem); 
             font-weight: 100;
             letter-spacing: 0.1em;
             text-align: center;
-            
             background: linear-gradient(to right, #6b7280 20%, #ffffff 50%, #6b7280 80%);
             background-size: 200% auto;
             color: transparent;
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite; /* Changed to infinite */
+            animation: shine 4s linear infinite;
         }
-        @keyframes shine {
-            to {
-                background-position: -200% center;
-            }
-        }
+        @keyframes shine { to { background-position: -200% center; } }
 
         .subtitle {
             font-weight: 300;
@@ -187,24 +199,19 @@
         .menu-btn .bar:nth-child(2) { top: 9px; }
         .menu-btn .bar:nth-child(3) { top: 18px; }
 
-        .menu-btn.open .bar:nth-child(1) {
-            top: 9px; transform: rotate(135deg);
-        }
-        .menu-btn.open .bar:nth-child(2) {
-            opacity: 0; left: -30px;
-        }
-        .menu-btn.open .bar:nth-child(3) {
-            top: 9px; transform: rotate(-135deg);
-        }
+        .menu-btn.open .bar:nth-child(1) { top: 9px; transform: rotate(135deg); }
+        .menu-btn.open .bar:nth-child(2) { opacity: 0; left: -30px; }
+        .menu-btn.open .bar:nth-child(3) { top: 9px; transform: rotate(-135deg); }
+
         #detail-brief-text {
             white-space: pre-line;
         }
-        .reveal {
+        .reveal, .content-reveal {
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
-        .reveal.visible {
+        .reveal.visible, .content-reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -231,7 +238,6 @@
           30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
           40%, 60% { transform: translate3d(4px, 0, 0); }
         }
-        /* New Glassmorphism Card Style for Password Page */
         .glassmorphism-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(12px);
@@ -243,6 +249,7 @@
 </head>
 <body class="antialiased">
     <div class="cursor"></div>
+    <div id="page-transition-overlay"></div>
     <canvas id="bg-canvas"></canvas>
 
     <div id="main-content" class="relative z-10 px-4 sm:px-6 lg:px-8 transition-all duration-300">
@@ -314,7 +321,7 @@ Key features include:
     
     <div id="project-detail">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
-            <header class="flex justify-between items-center">
+            <header class="flex justify-between items-center content-reveal">
                  <button id="back-to-portfolio" class="p-2 text-gray-400">
                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                  </button>
@@ -324,22 +331,22 @@ Key features include:
                     </div>
                 </div>
             </header>
-            <div class="mt-16 text-center">
+            <div class="mt-16 text-center content-reveal">
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
-            <div class="mt-12 overflow-hidden rounded-none">
+            <div class="mt-12 overflow-hidden rounded-none content-reveal">
                 <img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover">
             </div>
             
-            <div id="detail-icon-link-container" class="text-center mt-4"></div>
+            <div id="detail-icon-link-container" class="text-center mt-4 content-reveal"></div>
 
-            <div class="mt-8 px-2">
+            <div class="mt-8 px-2 content-reveal">
                 <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
                 <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
             </div>
-            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500">[ BRIEF ]</div>
-            <div class="mt-12 max-w-2xl mx-auto text-left">
+            <div class="mt-16 px-2 text-center text-sm tracking-[0.2em] text-gray-500 content-reveal">[ BRIEF ]</div>
+            <div class="mt-12 max-w-2xl mx-auto text-left content-reveal">
                 <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
                 <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
             </div>
@@ -402,6 +409,7 @@ Key features include:
         const passwordForm = document.getElementById('password-form');
         const passwordError = document.getElementById('password-error');
         const backFromPasswordBtn = document.getElementById('back-from-password');
+        const transitionOverlay = document.getElementById('page-transition-overlay');
 
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
@@ -461,15 +469,32 @@ Key features include:
 
         menuBtnWrappers.forEach(wrapper => wrapper.addEventListener('click', toggleMenu));
 
+        function performTransition(action) {
+            transitionOverlay.classList.remove('out');
+            transitionOverlay.innerHTML = ''; // Clear previous
+            
+            const lightSweepLeft = document.createElement('div');
+            lightSweepLeft.style.cssText = 'position: absolute; top: 50%; right: 50%; width: 50%; height: 1px; background: linear-gradient(to left, white, transparent); transform-origin: right; animation: sweep-left 0.6s ease-in-out;';
+            const lightSweepRight = document.createElement('div');
+            lightSweepRight.style.cssText = 'position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(to right, white, transparent); transform-origin: left; animation: sweep-right 0.6s ease-in-out;';
+            transitionOverlay.appendChild(lightSweepLeft);
+            transitionOverlay.appendChild(lightSweepRight);
+
+            setTimeout(() => {
+                action();
+                setTimeout(() => {
+                    transitionOverlay.classList.add('out');
+                }, 50);
+            }, 600);
+        }
+
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
-            if (projectDetailView.classList.contains('visible') || passwordPage.classList.contains('visible')) {
+            performTransition(() => {
                 hideProjectDetail();
                 hidePasswordPage();
-            }
-            if (mobileMenu.classList.contains('open')) {
-                toggleMenu();
-            }
+                if (mobileMenu.classList.contains('open')) toggleMenu();
+            });
         });
 
         function showProjectDetail(data) {
@@ -501,11 +526,21 @@ Key features include:
             document.body.classList.add('detail-view-active');
             projectDetailView.classList.add('visible');
             projectDetailView.scrollTo(0, 0);
+
+            const contentToReveal = projectDetailView.querySelectorAll('.content-reveal');
+            contentToReveal.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, index * 100);
+            });
         }
 
         function hideProjectDetail() {
             document.body.classList.remove('detail-view-active');
             projectDetailView.classList.remove('visible');
+            projectDetailView.querySelectorAll('.content-reveal').forEach(el => {
+                el.classList.remove('visible');
+            });
         }
         
         function showPasswordPage() {
@@ -525,7 +560,7 @@ Key features include:
             if (mobileMenu.classList.contains('open')) {
                 toggleMenu();
             }
-            setTimeout(showPasswordPage, 300);
+            performTransition(showPasswordPage);
         });
         
         passwordForm.addEventListener('submit', (e) => {
@@ -538,7 +573,7 @@ Key features include:
             }, 500);
         });
         
-        backFromPasswordBtn.addEventListener('click', hidePasswordPage);
+        backFromPasswordBtn.addEventListener('click', () => performTransition(hidePasswordPage));
 
         cards.forEach(card => {
             card.addEventListener('click', (e) => {
@@ -549,7 +584,7 @@ Key features include:
                     role: card.dataset.role, briefTitle: card.dataset.briefTitle,
                     briefText: card.dataset.briefText, link: card.dataset.link 
                 };
-                showProjectDetail(data);
+                performTransition(() => showProjectDetail(data));
             });
 
             card.addEventListener('mousemove', (e) => {
@@ -568,7 +603,7 @@ Key features include:
                 card.style.transition = 'transform 0.5s ease-in-out';
             });
         });
-        backToPortfolioBtn.addEventListener('click', hideProjectDetail);
+        backToPortfolioBtn.addEventListener('click', () => performTransition(hideProjectDetail));
         
         const revealElements = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
@@ -579,6 +614,12 @@ Key features include:
             });
         }, { threshold: 0.1 });
         revealElements.forEach(el => observer.observe(el));
+        
+        window.addEventListener('load', () => {
+             setTimeout(() => {
+                transitionOverlay.classList.add('out');
+             }, 600);
+        });
 
 
         // --- WebGL Background Logic ---
@@ -606,24 +647,17 @@ Key features include:
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // SCENE 1: Monolith Artifact (Enhanced)
         function createMonolithScene() {
             scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
             camera.position.z = 7;
             const geometry = new THREE.BoxGeometry(0.7, 5, 0.7);
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x111827, metalness: 0.95, roughness: 0.3,
-            });
+            const material = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.95, roughness: 0.3 });
             const monolith = new THREE.Mesh(geometry, material);
             scene.add(monolith);
-
             const spotlight = new THREE.SpotLight(0xffffff, 5, 30, Math.PI * 0.1, 0.4, 1.5);
             spotlight.position.set(0, 5, 5);
             scene.add(spotlight);
-            
-            const ambient = new THREE.AmbientLight(0xffffff, 0.05);
-            scene.add(ambient);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.05));
             animationLoop = () => {
                 const t = clock.getElapsedTime();
                 monolith.rotation.y = t * 0.08;
@@ -634,84 +668,61 @@ Key features include:
             };
         }
 
-        // SCENE 2: Tectonic Waves (Enhanced)
         function createTectonicScene() {
             camera.position.set(0, 4, 6);
             camera.lookAt(0, 0, 0);
             scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
             const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x030712, metalness: 0.8, roughness: 0.6
-            });
+            const material = new THREE.MeshStandardMaterial({ color: 0x030712, metalness: 0.8, roughness: 0.6 });
             const plane = new THREE.Mesh(geometry, material);
             plane.rotation.x = -Math.PI / 2;
             scene.add(plane);
-            
             const originalPositions = new Float32Array(geometry.attributes.position.array);
-
             const light1 = new THREE.PointLight(0x5b21b6, 3, 15);
             light1.position.set(-8, 2, 0);
             scene.add(light1);
-
             const light2 = new THREE.PointLight(0x155e75, 3, 15);
             light2.position.set(8, 2, 0);
             scene.add(light2);
-
             animationLoop = () => {
                 const t = clock.getElapsedTime();
                 const positions = geometry.attributes.position.array;
                 for (let i = 0; i < positions.length / 3; i++) {
-                    const x = originalPositions[i * 3];
-                    const y = originalPositions[i * 3 + 1];
-                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4;
-                    const wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
+                    const x = originalPositions[i * 3], y = originalPositions[i * 3 + 1];
+                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4, wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
                     positions[i * 3 + 2] = wave1 + wave2;
                 }
                 geometry.attributes.position.needsUpdate = true;
-                
                 light1.position.x = Math.sin(t * 0.5) * 8;
                 light2.position.x = Math.cos(t * 0.3) * -8;
             };
         }
         
-        // SCENE 3: Cosmic Rings (Enhanced)
         function createRingsScene() {
             camera.position.set(0, 3, 7);
             camera.lookAt(0, 0, 0);
-            
             const ringsGroup = new THREE.Group();
             scene.add(ringsGroup);
-
             const createRing = (radius) => {
-                const geometry = new THREE.TorusGeometry(radius, 0.025, 24, 128);
-                const material = new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 });
-                const ring = new THREE.Mesh(geometry, material);
+                const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.025, 24, 128), new THREE.MeshStandardMaterial({ color: 0x6b7280, metalness: 1.0, roughness: 0.2 }));
                 ring.rotation.x = Math.PI / 2;
                 return ring;
             };
-
-            for(let i = 0; i < 5; i++) {
-                ringsGroup.add(createRing(2.5 + i * 0.5));
-            }
-
+            for(let i = 0; i < 5; i++) ringsGroup.add(createRing(2.5 + i * 0.5));
             const keyLight = new THREE.SpotLight(0xffffff, 8, 30, Math.PI * 0.1, 0.2, 2);
             keyLight.position.set(0, 8, 4);
             scene.add(keyLight);
-            
-            const ambient = new THREE.AmbientLight(0xffffff, 0.1);
-            scene.add(ambient);
-
+            scene.add(new THREE.AmbientLight(0xffffff, 0.1));
             animationLoop = () => {
                 const t = clock.getElapsedTime();
-                ringsGroup.children.forEach((ring, index) => {
-                    ring.rotation.z = t * (0.1 - index * 0.02) * (index % 2 === 0 ? 1 : -1);
+                ringsGroup.children.forEach((ring, i) => {
+                    ring.rotation.z = t * (0.1 - i * 0.02) * (i % 2 === 0 ? 1 : -1);
                 });
                 ringsGroup.rotation.y = t * 0.04;
                 ringsGroup.rotation.z = t * 0.02;
             };
         }
 
-        // --- Initialize ---
         function animate() {
             requestAnimationFrame(animate);
             animationLoop();
@@ -720,8 +731,7 @@ Key features include:
 
         initBaseScene();
         const scenes = [createMonolithScene, createTectonicScene, createRingsScene];
-        const randomSceneIndex = Math.floor(Math.random() * scenes.length);
-        scenes[randomSceneIndex]();
+        scenes[Math.floor(Math.random() * scenes.length)]();
         animate();
     </script>
 </body>
