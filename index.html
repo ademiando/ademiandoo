@@ -22,7 +22,6 @@
             z-index: -1;
         }
         .main-title {
-            /* Restored text-align center and kept smaller font size */
             font-size: clamp(2.5rem, 10vw, 4rem); 
             font-weight: 100;
             color: rgba(255, 255, 255, 0.8);
@@ -98,6 +97,9 @@
         .menu-btn.open .bar:nth-child(3) {
             top: 9px; transform: rotate(-135deg);
         }
+        #detail-brief-text {
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -129,28 +131,44 @@
                 <!-- Cards Section -->
                 <div class="mt-20 max-w-2xl mx-auto space-y-8">
                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none" 
-                       data-category="CAMPAIGN | WEBSITE" data-title="855-HOW-TO-QUIT (OPIOIDS)"
+                       data-category="WEB_APPLICATION | DASHBOARD" 
+                       data-title="Project OmniFolio (v26)"
                        data-img="assets/assets1.jpg"
-                       data-client="RAW MATERIALS, SERVICE PLAN" data-role="CREATIVE TECHNOLOGIST | LEAD DEVELOPER"
-                       data-brief-title="A Life-Saving Digital Experience"
-                       data-brief-text="Opioid addiction affects over 6 million people in the U.S., with someone dying from an overdose every six minutes. 855-How-To-Quit is a groundbreaking hotline designed to intervene at critical moments, using a unique approach: the numerical codes on opioid pills double as phone numbers. When dialed, these numbers connect users to inspiring stories of recovery, followed by live counseling with addiction experts.">
-                        <img src="assets/assets1.jpg" alt="Project Image 1" class="w-full h-full object-cover card-image">
+                       data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
+                       data-role="LEAD DEVELOPER | UI/UX DESIGNER"
+                       data-link="https://bloomboard-two.vercel.app/dashboard"
+                       data-brief-title="An All-in-One Financial Dashboard"
+                       data-brief-text="This project is a comprehensive portfolio dashboard application designed to track diverse asset classes within a single, cohesive interface. Built as a single-page application (SPA) using React, it serves as a sophisticated personal wealth management tool.
+
+At its core is a robust transaction-based tracking system. Every buy, sell, deposit, or withdrawal is logged, and the application dynamically calculates current asset holdings, average price, and realized/unrealized P&L.
+
+Key features include:
+- Multi-Asset Tracking: Manages not only Stocks (using real-time data from Finnhub) and Crypto (from CoinGecko), but also includes full functionality for tracking Non-Liquid Assets (like property or collectibles) with estimated year-over-year (YOY) gains.
+- Performance Analytics: Calculates and visualizes detailed trade metrics, including win rate, average profit/loss, and maximum profit/loss.
+- Dynamic Data Visualization: Features a portfolio equity curve, asset allocation breakdowns (by sector and individual asset), and price sparklines for each holding.
+- Full Portfolio Management: Users can add/withdraw balances, import/export their entire transaction history via CSV files, and toggle the display currency between IDR and USD.
+- In-Depth Asset Analysis: Each asset has a detail modal that integrates a full TradingView widget for in-depth technical analysis.">
+                        <img src="assets/assets1.jpg" alt="Project OmniFolio" class="w-full h-full object-cover card-image">
                     </a>
                      <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
-                       data-category="EXPERIENCE | INSTALLATION" data-title="VASES OF HATRED"
+                       data-category="API | BACKEND" 
+                       data-title="Project FinTrack API"
                        data-img="assets/assets2.jpg"
-                       data-client="JUNGLE STUDIOS" data-role="INTERACTIVE ARTIST | 3D MODELER"
-                       data-brief-title="An Immersive Botanical Horror"
-                       data-brief-text="Vases of Hatred is an interactive art installation that explores the darker side of nature. Visitors enter a dimly lit space filled with exotic, bioluminescent plants. As they approach, the plants react with subtle, unsettling movements and sounds, creating a tense atmosphere. The experience blurs the line between beauty and fear, technology and the natural world.">
-                        <img src="assets/assets2.jpg" alt="Project Vases of Hatred" class="w-full h-full object-cover card-image">
+                       data-client="JUNGLE STUDIOS" 
+                       data-role="BACKEND DEVELOPER"
+                       data-brief-title="Financial Tracking API Service"
+                       data-brief-text="This is a placeholder description for the FinTrack API project. It involves creating a robust backend service for financial data aggregation and analysis.">
+                        <img src="assets/assets2.jpg" alt="Project FinTrack API" class="w-full h-full object-cover card-image">
                     </a>
                      <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
-                       data-category="AR | GAMING" data-title="PIZZA POWER"
+                       data-category="AI | GENERATIVE TEXT" 
+                       data-title="Project Housel Philosophy (EssayGen)"
                        data-img="assets/assets3.jpg"
-                       data-client="PIZZA HUT x TMNT" data-role="AR DEVELOPER | GAME DESIGNER"
-                       data-brief-title="Cowabunga! Your Pizza Box is a Portal"
-                       data-brief-text="In this collaboration with Pizza Hut and Teenage Mutant Ninja Turtles, we turned every pizza box into an augmented reality arcade. By scanning a QR code, users launch a web-based AR game where the Ninja Turtles battle Shredder's minions right on their table. The game features collectible power-ups and social sharing integrations.">
-                        <img src="assets/assets3.jpg" alt="Project Pizza Power" class="w-full h-full object-cover card-image">
+                       data-client="ACADEMIC RESEARCH" 
+                       data-role="AI ENGINEER | RESEARCHER"
+                       data-brief-title="AI-Powered Philosophy Essay Generator"
+                       data-brief-text="This is a placeholder description for the Housel Philosophy project. It focuses on using generative AI models to create philosophical essays and arguments.">
+                        <img src="assets/assets3.jpg" alt="Project Housel Philosophy" class="w-full h-full object-cover card-image">
                     </a>
                 </div>
             </main>
@@ -182,6 +200,7 @@
             <div class="mt-12 max-w-2xl mx-auto text-left">
                 <h2 id="detail-brief-title" class="text-2xl sm:text-3xl font-light text-white"></h2>
                 <p id="detail-brief-text" class="mt-6 text-gray-300 leading-relaxed"></p>
+                <div id="detail-link-container" class="mt-10 text-center"></div>
             </div>
         </div>
     </div>
@@ -230,7 +249,6 @@
         function toggleMenu() {
             const isOpen = mobileMenu.classList.toggle('open');
             document.body.style.overflow = isOpen ? 'hidden' : '';
-            // Sync all hamburger icons to the correct state
             menuBtns.forEach(btn => btn.classList.toggle('open', isOpen));
         }
 
@@ -255,9 +273,23 @@
             document.getElementById('detail-role').textContent = data.role;
             document.getElementById('detail-brief-title').textContent = data.briefTitle;
             document.getElementById('detail-brief-text').textContent = data.briefText;
+            
+            const linkContainer = document.getElementById('detail-link-container');
+            linkContainer.innerHTML = ''; // Clear previous button before adding a new one
+
+            if (data.link) {
+                const linkButton = document.createElement('a');
+                linkButton.href = data.link;
+                linkButton.target = '_blank';
+                linkButton.rel = 'noopener noreferrer';
+                linkButton.className = 'inline-block bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-8 transition-colors duration-300 rounded-none';
+                linkButton.textContent = 'Visit Project';
+                linkContainer.appendChild(linkButton);
+            }
+
             document.body.classList.add('detail-view-active');
             projectDetailView.classList.add('visible');
-            window.scrollTo(0, 0);
+            projectDetailView.scrollTo(0, 0);
         }
 
         function hideProjectDetail() {
@@ -269,10 +301,14 @@
             card.addEventListener('click', (e) => {
                 e.preventDefault();
                 const data = {
-                    category: card.dataset.category, title: card.dataset.title,
-                    img: card.dataset.img, client: card.dataset.client,
-                    role: card.dataset.role, briefTitle: card.dataset.briefTitle,
+                    category: card.dataset.category,
+                    title: card.dataset.title,
+                    img: card.dataset.img,
+                    client: card.dataset.client,
+                    role: card.dataset.role,
+                    briefTitle: card.dataset.briefTitle,
                     briefText: card.dataset.briefText,
+                    link: card.dataset.link 
                 };
                 showProjectDetail(data);
             });
