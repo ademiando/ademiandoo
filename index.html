@@ -22,49 +22,44 @@
             height: 100%;
             z-index: -1;
         }
-        /* New Ripple Cursor */
+        /* New Realistic Water Ripple Cursor */
         .cursor {
-            width: 8px;
-            height: 8px;
-            background-color: white;
-            border-radius: 50%;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            transition: transform 0.3s ease;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .cursor::after {
-            content: "";
+        .cursor.visible {
+            opacity: 1;
+        }
+        .ripple {
             position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            animation: ripple-effect 1.5s infinite ease-out;
-            transition: all 0.3s ease;
+            border: 1px solid white;
+            animation: water-ripple-effect 1.2s ease-out;
+            opacity: 0;
         }
-        .cursor.hovered {
-            transform: translate(-50%, -50%) scale(1.5);
+        .cursor.hovered .ripple {
+             border-color: #a5b4fc;
         }
-        .cursor.hovered::after {
-            border-color: rgba(255, 255, 255, 0.8);
-            animation-duration: 1s;
-        }
-        @keyframes ripple-effect {
+        @keyframes water-ripple-effect {
             0% {
-                transform: translate(-50%, -50%) scale(0);
+                transform: scale(0);
                 opacity: 1;
             }
             100% {
-                transform: translate(-50%, -50%) scale(1.5);
+                transform: scale(2);
                 opacity: 0;
             }
+        }
+        body.is-touch .cursor {
+            display: none; /* Hide cursor by default on touch devices */
         }
 
         .main-title {
@@ -146,7 +141,6 @@
         #detail-brief-text {
             white-space: pre-line;
         }
-        /* Scroll Reveal Animation */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -156,13 +150,12 @@
             opacity: 1;
             transform: translateY(0);
         }
-        /* Enhanced Link Hovers */
         header a, #mobile-menu a, #mobile-menu footer a {
             transition: transform 0.3s ease, color 0.3s ease;
         }
         header a:hover, #mobile-menu a:hover, #mobile-menu footer a:hover {
             transform: translateY(-3px);
-            color: #a5b4fc; /* light indigo */
+            color: #a5b4fc;
         }
     </style>
 </head>
@@ -310,10 +303,39 @@ Key features include:
         const cursor = document.querySelector('.cursor');
 
         // Custom Cursor Logic
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.left = `${e.clientX}px`;
-            cursor.style.top = `${e.clientY}px`;
-        });
+        const isTouchDevice = 'ontouchstart' in window;
+        if (isTouchDevice) {
+            document.body.classList.add('is-touch');
+        }
+
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            cursor.appendChild(ripple);
+            cursor.style.left = `${x}px`;
+            cursor.style.top = `${y}px`;
+            setTimeout(() => {
+                ripple.remove();
+            }, 1200);
+        }
+
+        if (!isTouchDevice) {
+            cursor.classList.add('visible');
+            window.addEventListener('mousemove', (e) => {
+                cursor.style.left = `${e.clientX}px`;
+                cursor.style.top = `${e.clientY}px`;
+            });
+            setInterval(() => {
+                 if (!cursor.matches(':hover')) {
+                    createRipple(parseInt(cursor.style.left), parseInt(cursor.style.top));
+                 }
+            }, 500);
+        } else {
+            document.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                createRipple(touch.clientX, touch.clientY);
+            });
+        }
         
         const interactiveElements = document.querySelectorAll('a, button, .menu-btn-wrapper');
         interactiveElements.forEach(el => {
@@ -384,6 +406,7 @@ Key features include:
             });
 
             card.addEventListener('mousemove', (e) => {
+                if(isTouchDevice) return;
                 const { left, top, width, height } = card.getBoundingClientRect();
                 const x = e.clientX - left - width / 2;
                 const y = e.clientY - top - height / 2;
@@ -393,6 +416,7 @@ Key features include:
                 card.style.transition = 'transform 0.1s ease-out';
             });
             card.addEventListener('mouseleave', () => {
+                 if(isTouchDevice) return;
                 card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
                 card.style.transition = 'transform 0.5s ease-in-out';
             });
