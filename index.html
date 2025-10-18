@@ -42,14 +42,13 @@
             transform: scale(1.05);
         }
         
-        /* New Glassmorphism Menu Style */
         #mobile-menu {
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
             opacity: 0; 
             visibility: hidden; 
-            background-color: rgba(10, 10, 18, 0.5); /* Semi-transparent background */
+            background-color: rgba(10, 10, 18, 0.5);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px); /* For Safari */
+            -webkit-backdrop-filter: blur(16px);
         }
         #mobile-menu.open {
             opacity: 1; 
@@ -72,15 +71,13 @@
             opacity: 0; transform: scale(0.95); pointer-events: none;
         }
         
-        /* Animated Hamburger Icon Styles */
         .menu-btn-wrapper {
-             /* Wrapper to give some padding for easier clicking */
             padding: 0.5rem; 
         }
         .menu-btn {
             width: 28px; height: 22px; position: relative;
             transform: rotate(0deg); transition: .5s ease-in-out; cursor: pointer;
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
         }
         .menu-btn .bar {
             display: block; position: absolute; height: 3px; width: 100%;
@@ -129,7 +126,7 @@
 
                 <!-- Cards Section -->
                 <div class="mt-20 max-w-2xl mx-auto space-y-8">
-                    <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer" 
+                    <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none" 
                        data-category="CAMPAIGN | WEBSITE" data-title="855-HOW-TO-QUIT (OPIOIDS)"
                        data-img="assets/montamap.jpg"
                        data-client="RAW MATERIALS, SERVICE PLAN" data-role="CREATIVE TECHNOLOGIST | LEAD DEVELOPER"
@@ -137,7 +134,7 @@
                        data-brief-text="Opioid addiction affects over 6 million people in the U.S., with someone dying from an overdose every six minutes. 855-How-To-Quit is a groundbreaking hotline designed to intervene at critical moments, using a unique approach: the numerical codes on opioid pills double as phone numbers. When dialed, these numbers connect users to inspiring stories of recovery, followed by live counseling with addiction experts.">
                         <img src="assets/montamap.jpg" alt="Project MontaMap" class="w-full h-full object-cover card-image">
                     </a>
-                     <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer"
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
                        data-category="EXPERIENCE | INSTALLATION" data-title="VASES OF HATRED"
                        data-img="assets/assets2.jpg"
                        data-client="JUNGLE STUDIOS" data-role="INTERACTIVE ARTIST | 3D MODELER"
@@ -145,7 +142,7 @@
                        data-brief-text="Vases of Hatred is an interactive art installation that explores the darker side of nature. Visitors enter a dimly lit space filled with exotic, bioluminescent plants. As they approach, the plants react with subtle, unsettling movements and sounds, creating a tense atmosphere. The experience blurs the line between beauty and fear, technology and the natural world.">
                         <img src="assets/assets2.jpg" alt="Project Vases of Hatred" class="w-full h-full object-cover card-image">
                     </a>
-                     <a href="#" class="card block bg-black/30 rounded-lg overflow-hidden shadow-2xl shadow-black/20 cursor-pointer"
+                     <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 cursor-pointer rounded-none"
                        data-category="AR | GAMING" data-title="PIZZA POWER"
                        data-img="assets/assets3.jpg"
                        data-client="PIZZA HUT x TMNT" data-role="AR DEVELOPER | GAME DESIGNER"
@@ -174,7 +171,7 @@
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
-            <div class="mt-12 rounded-lg overflow-hidden"><img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover"></div>
+            <div class="mt-12 overflow-hidden rounded-none"><img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover"></div>
             <div class="mt-8 px-2">
                 <p class="text-sm text-gray-300"><span class="text-gray-500 font-semibold">CLIENT:</span> <span id="detail-client"></span></p>
                 <p class="text-sm text-gray-300 mt-1"><span class="text-gray-500 font-semibold">ROLE:</span> <span id="detail-role"></span></p>
