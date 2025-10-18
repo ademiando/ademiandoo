@@ -22,7 +22,7 @@
             height: 100%;
             z-index: -1;
         }
-        /* New Realistic Water Ripple Cursor */
+        /* Enhanced Water Ripple Cursor with a visible dot */
         .cursor {
             position: fixed;
             top: 0;
@@ -31,35 +31,47 @@
             pointer-events: none;
             transform: translate(-50%, -50%);
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            /* This is the central dot */
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
         }
         .cursor.visible {
             opacity: 1;
         }
         .ripple {
             position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%); /* Center ripple inside the dot */
             width: 40px;
             height: 40px;
             border-radius: 50%;
             border: 1px solid white;
-            animation: water-ripple-effect 1.2s ease-out;
-            opacity: 0;
+            animation: water-ripple-effect 1.2s ease-out forwards;
+            opacity: 0; /* Animation will handle opacity */
+        }
+        .cursor.hovered {
+            transform: translate(-50%, -50%) scale(1.8);
         }
         .cursor.hovered .ripple {
              border-color: #a5b4fc;
+             animation-duration: 1s;
         }
         @keyframes water-ripple-effect {
             0% {
-                transform: scale(0);
-                opacity: 1;
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.8;
             }
             100% {
-                transform: scale(2);
+                transform: translate(-50%, -50%) scale(2.5);
                 opacity: 0;
             }
         }
         body.is-touch .cursor {
-            display: none; /* Hide cursor by default on touch devices */
+            display: none;
         }
 
         .main-title {
@@ -157,6 +169,13 @@
             transform: translateY(-3px);
             color: #a5b4fc;
         }
+        #back-to-portfolio, #detail-icon-link-container a {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        #back-to-portfolio:hover, #detail-icon-link-container a:hover {
+            transform: scale(1.15);
+            color: #fff;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -177,8 +196,8 @@
             <main class="py-16">
                 <h1 class="main-title reveal">ADEMIANDO</h1>
                 <p class="subtitle mt-2 reveal">
-                    <span>PROJECTS</span><span class="mx-2 text-gray-600">|</span>
-                    <span>COLLABORATIONS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>IDEAS</span><span class="mx-2 text-gray-600">|</span>
+                    <span>EXPERIMENTS</span><span class="mx-2 text-gray-600">|</span>
                     <span>EXPLORATIONS</span>
                 </p>
 
@@ -231,7 +250,7 @@ Key features include:
     <div id="project-detail">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
             <header class="flex justify-between items-center">
-                 <button id="back-to-portfolio" class="p-2 text-gray-400 hover:text-white transition-colors">
+                 <button id="back-to-portfolio" class="p-2 text-gray-400">
                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                  </button>
                  <div class="menu-btn-wrapper z-50">
@@ -302,20 +321,26 @@ Key features include:
         const homeLink = document.getElementById('home-link');
         const cursor = document.querySelector('.cursor');
 
-        // Custom Cursor Logic
         const isTouchDevice = 'ontouchstart' in window;
         if (isTouchDevice) {
             document.body.classList.add('is-touch');
         }
 
         function createRipple(x, y) {
+            const rippleContainer = document.createElement('div');
+            rippleContainer.style.position = 'fixed';
+            rippleContainer.style.left = `${x}px`;
+            rippleContainer.style.top = `${y}px`;
+            rippleContainer.style.zIndex = '1000';
+            rippleContainer.style.pointerEvents = 'none';
+            
             const ripple = document.createElement('div');
             ripple.className = 'ripple';
-            cursor.appendChild(ripple);
-            cursor.style.left = `${x}px`;
-            cursor.style.top = `${y}px`;
+            rippleContainer.appendChild(ripple);
+            document.body.appendChild(rippleContainer);
+            
             setTimeout(() => {
-                ripple.remove();
+                rippleContainer.remove();
             }, 1200);
         }
 
@@ -325,22 +350,33 @@ Key features include:
                 cursor.style.left = `${e.clientX}px`;
                 cursor.style.top = `${e.clientY}px`;
             });
-            setInterval(() => {
-                 if (!cursor.matches(':hover')) {
-                    createRipple(parseInt(cursor.style.left), parseInt(cursor.style.top));
+            let rippleInterval = setInterval(() => {
+                 if (!cursor.matches('.hovered')) { 
+                    const newRipple = document.createElement('div');
+                    newRipple.className = 'ripple';
+                    cursor.appendChild(newRipple);
+                    setTimeout(() => newRipple.remove(), 1200);
                  }
-            }, 500);
+            }, 800);
         } else {
             document.addEventListener('touchstart', (e) => {
                 const touch = e.touches[0];
                 createRipple(touch.clientX, touch.clientY);
-            });
+            }, {passive: true});
         }
         
         const interactiveElements = document.querySelectorAll('a, button, .menu-btn-wrapper');
         interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            el.addEventListener('mouseenter', () => {
+                if (!isTouchDevice) {
+                    cursor.classList.add('hovered');
+                    const newRipple = document.createElement('div');
+                    newRipple.className = 'ripple';
+                    cursor.appendChild(newRipple);
+                    setTimeout(() => newRipple.remove(), 1200);
+                }
+            });
+            el.addEventListener('mouseleave', () => !isTouchDevice && cursor.classList.remove('hovered'));
         });
 
         function toggleMenu() {
@@ -378,7 +414,7 @@ Key features include:
                 linkIcon.href = data.link;
                 linkIcon.target = '_blank';
                 linkIcon.rel = 'noopener noreferrer';
-                linkIcon.className = 'inline-block text-gray-400 hover:text-white transition-colors duration-300';
+                linkIcon.className = 'inline-block text-gray-400';
                 linkIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
                 iconLinkContainer.appendChild(linkIcon);
             }
