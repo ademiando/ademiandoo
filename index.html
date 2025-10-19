@@ -368,7 +368,7 @@ Key features include:
             </div>
 
             <div id="case-study-section" class="mt-24 max-w-2xl mx-auto text-center content-reveal"></div>
-            <div id="related-projects-section" class="mt-24 w-full text-center content-reveal"></div>
+            <div id="related-projects-section" class="mt-24 w-full content-reveal"></div>
 
         </div>
     </div>
@@ -597,13 +597,15 @@ Key features include:
             
             const relatedProjectsContainer = document.getElementById('related-projects-section');
             relatedProjectsContainer.innerHTML = `
-                <p class="detail-label">[ RELATED PROJECTS ]</p>
-                <div class="grid grid-cols-3 gap-4 mt-8">
-                    <a href="#" class="related-card" data-index="0"><img src="assets/assets01.jpg" class="w-full h-full object-cover"></a>
-                    <a href="#" class="related-card" data-index="1"><img src="assets/assets02.jpg" class="w-full h-full object-cover"></a>
-                    <a href="#" class="related-card" data-index="2"><img src="assets/assets03.jpg" class="w-full h-full object-cover"></a>
+                <div class="max-w-4xl mx-auto">
+                    <p class="detail-label">[ RELATED PROJECTS ]</p>
+                    <div class="grid grid-cols-3 gap-4 mt-8">
+                        <a href="#" class="related-card" data-index="0"><img src="assets/assets1.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card" data-index="1"><img src="assets/assets2.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
+                    </div>
                 </div>
-                <div class="mt-12 py-4 bg-gray-900/50 flex justify-between items-center">
+                <div class="sticky bottom-0 left-0 w-full mt-12 py-4 bg-gray-900/70 backdrop-blur-sm flex justify-between items-center">
                     <button id="prev-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">← PREV</button>
                     <button id="back-to-home-btn" class="related-nav-btn text-sm tracking-widest">BACK TO HOME</button>
                     <button id="next-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">NEXT →</button>
