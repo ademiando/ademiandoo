@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1271,7 +1270,7 @@
                     new window.TradingView.widget({
                         autosize: true,
                         symbol: formatSymbolForTV(asset),
-                        interval: "240",
+                        interval: asset.type === 'stock' ? 'D' : '240',
                         timezone: "Asia/Jakarta",
                         theme: "dark",
                         style: "1",
