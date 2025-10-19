@@ -544,11 +544,11 @@ Key features include:
                 htmlContent += `<p class="italic text-gray-400">"${parts[0].trim()}"</p>`;
             }
             if (parts.length > 1 && parts[1].trim() !== '') {
-                htmlContent += `<h3 class="font-semibold text-white mt-6 mb-3 not-italic">Key Features:</h3>`;
+                htmlContent += `<h3 class="font-bold text-white mt-6 mb-3 not-italic">Key Features:</h3>`;
                 htmlContent += '<ul class="space-y-2 list-none not-italic">';
                 const features = parts[1].split('- ').filter(f => f.trim() !== '');
                 features.forEach(feature => {
-                    htmlContent += `<li class="flex items-start"><svg class="w-4 h-4 mr-3 mt-1 flex-shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>${feature.trim()}</span></li>`;
+                    htmlContent += `<li class="flex items-start font-light"><svg class="w-4 h-4 mr-3 mt-1 flex-shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>${feature.trim()}</span></li>`;
                 });
                 htmlContent += '</ul>';
             }
@@ -653,21 +653,17 @@ Key features include:
         function navigateProject(direction) {
             const totalProjects = cards.length;
             let newIndex = (currentProjectIndex + direction + totalProjects) % totalProjects;
-            const nextCard = cards[newIndex];
-            const data = {
-                category: nextCard.dataset.category, title: nextCard.dataset.title,
-                img: nextCard.dataset.img, client: nextCard.dataset.client,
-                role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
-                briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
-                viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg
-            };
-            
-            projectDetailView.style.transition = 'opacity 0.2s ease-out';
-            projectDetailView.style.opacity = 0;
-            setTimeout(() => {
+            performTransition(() => {
+                 const nextCard = cards[newIndex];
+                const data = {
+                    category: nextCard.dataset.category, title: nextCard.dataset.title,
+                    img: nextCard.dataset.img, client: nextCard.dataset.client,
+                    role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
+                    briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
+                    viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg
+                };
                 showProjectDetail(data, newIndex);
-                projectDetailView.style.opacity = 1;
-            }, 200);
+            });
         }
 
         docLink.addEventListener('click', (e) => {
@@ -714,7 +710,17 @@ Key features include:
                 e.preventDefault();
                 const cardIndex = parseInt(e.target.closest('.related-card').dataset.index);
                 if (cardIndex !== currentProjectIndex) {
-                    navigateProject(cardIndex - currentProjectIndex);
+                    performTransition(() => {
+                        const nextCard = cards[cardIndex];
+                        const data = {
+                            category: nextCard.dataset.category, title: nextCard.dataset.title,
+                            img: nextCard.dataset.img, client: nextCard.dataset.client,
+                            role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
+                            briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
+                            viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg
+                        };
+                        showProjectDetail(data, cardIndex);
+                    });
                 }
             }
         });
