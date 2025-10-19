@@ -159,7 +159,9 @@
             transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
         }
         #project-detail {
-            background-color: #0A0A12; 
+            background-color: rgba(10, 10, 18, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             overflow-y: auto;
             transform: translateY(20px);
         }
@@ -346,7 +348,7 @@ Key features include:
     </div>
     
     <div id="project-detail">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32"> <!-- Added padding-bottom -->
             <div class="mt-16 text-center content-reveal">
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
@@ -369,7 +371,6 @@ Key features include:
 
             <div id="case-study-section" class="mt-24 max-w-2xl mx-auto text-center content-reveal"></div>
             <div id="related-projects-section" class="mt-24 w-full content-reveal"></div>
-
         </div>
     </div>
 
@@ -605,7 +606,7 @@ Key features include:
                         <a href="#" class="related-card" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
                     </div>
                 </div>
-                <div class="sticky bottom-0 left-0 w-full mt-12 py-4 bg-gray-900/70 backdrop-blur-sm flex justify-between items-center">
+                <div class="fixed bottom-0 left-0 w-full mt-12 py-4 bg-gray-900/70 backdrop-blur-sm flex justify-between items-center z-[110]">
                     <button id="prev-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">← PREV</button>
                     <button id="back-to-home-btn" class="related-nav-btn text-sm tracking-widest">BACK TO HOME</button>
                     <button id="next-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">NEXT →</button>
