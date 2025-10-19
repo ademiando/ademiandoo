@@ -145,9 +145,16 @@
             }).format(displayValue);
           } else { 
             displayValue = valueIsUSD ? value * usdIdr : value;
-             return new Intl.NumberFormat('id-ID', {
-              notation: 'compact',
-              compactDisplay: 'short',
+            if (displayValue >= 1000000000) {
+                return `Rp ${(displayValue / 1000000000).toFixed(2).replace('.', ',')}B`;
+            }
+            if (displayValue >= 1000000) {
+                return `Rp ${(displayValue / 1000000).toFixed(2).replace('.', ',')}M`;
+            }
+            if (displayValue >= 1000) {
+                return `Rp ${(displayValue / 1000).toFixed(2).replace('.', ',')}K`;
+            }
+            return new Intl.NumberFormat('id-ID', {
               style: 'currency',
               currency: 'IDR',
               minimumFractionDigits: 0,
@@ -1042,12 +1049,126 @@
         };
         const TradeStatsView = ({ stats, transactions, displaySymbol, usdIdr }) => {
             const [chartRange, setChartRange] = useState("All");
-            const { maxProfitPct, maxLossPct } = useMemo(() => { const maxProfitTx = transactions.find(tx => tx.realized === stats.maxProfit); const profitPct = maxProfitTx && maxProfitTx.costOfSold > 0 ? (maxProfitTx.realized / maxProfitTx.costOfSold) * 100 : 0; const maxLossTx = transactions.find(tx => tx.realized === stats.maxLoss); const lossPct = maxLossTx && maxLossTx.costOfSold > 0 ? (maxLossTx.realized / maxLossTx.costOfSold) * 100 : 0; return { maxProfitPct: profitPct, maxLossPct: lossPct }; }, [transactions, stats.maxProfit, stats.maxLoss]);
+            const { maxProfitPct, maxLossPct } = useMemo(() => {
+                let profitPct = 0;
+                if (stats.maxProfit > 0) {
+                    const maxProfitTx = transactions.find(tx => tx.realized === stats.maxProfit);
+                    if (maxProfitTx && maxProfitTx.costOfSold > 0) {
+                        profitPct = (maxProfitTx.realized / maxProfitTx.costOfSold) * 100;
+                    }
+                }
+                
+                let lossPct = 0;
+                if (stats.maxLoss < 0) {
+                    const maxLossTx = transactions.find(tx => tx.realized === stats.maxLoss);
+                    if (maxLossTx && maxLossTx.costOfSold > 0) {
+                        lossPct = (maxLossTx.realized / maxLossTx.costOfSold) * 100;
+                    }
+                }
+
+                return { maxProfitPct: profitPct, maxLossPct: lossPct };
+            }, [transactions, stats.maxProfit, stats.maxLoss]);
+
             const realizedGainSeries = useMemo(() => { const sorted = [...transactions.filter(t => t.type === 'sell' || t.type === 'delete')].sort((a, b) => a.date - b.date); let cumulativeGain = 0; const points = sorted.map(tx => { cumulativeGain += tx.realized || 0; return { t: tx.date, v: displaySymbol === '$' ? cumulativeGain : cumulativeGain * usdIdr }; }); if (points.length > 0) points.unshift({ t: points[0].t - 86400000, v: 0 }); return points.length ? points : [{ t: Date.now() - 1000, v: 0 }, {t: Date.now(), v:0}]; }, [transactions, displaySymbol, usdIdr]);
             const sells = useMemo(() => transactions.filter(tx => tx.type === 'sell' || tx.type === 'delete'), [transactions]); const realizedGainOnly = useMemo(() => sells.filter(tx => tx.realized > 0).reduce((sum, tx) => sum + tx.realized, 0), [sells]); const realizedLossOnly = useMemo(() => sells.filter(tx => tx.realized < 0).reduce((sum, tx) => sum + tx.realized, 0), [sells]);
             const topGainers = useMemo(() => { const gainers = {}; sells.forEach(tx => { if (!gainers[tx.symbol]) gainers[tx.symbol] = { trades: 0, pnl: 0, cost: 0 }; gainers[tx.symbol].trades++; gainers[tx.symbol].pnl += tx.realized; gainers[tx.symbol].cost += tx.costOfSold || 0; }); return Object.entries(gainers).map(([symbol, data]) => ({ symbol, ...data, pnlPct: data.cost > 0 ? (data.pnl / data.cost) * 100 : 0 })).sort((a, b) => b.pnl - a.pnl).slice(0, 5); }, [sells]);
+            
             if (!stats) return <div className="p-4 text-center text-gray-500">No trade data available.</div>;
-            return ( <div className="p-4 space-y-6"> <div className="glass-card p-4"> <div className="flex items-center justify-between"> <div><p className="text-sm text-gray-400">Win Rate</p><p className="text-3xl font-bold text-white mt-1">{stats.winRate.toFixed(2)}%</p></div> <div className="relative w-24 h-24"><svg className="w-full h-full transform -rotate-90"><circle cx="50%" cy="50%" r="45%" stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="transparent" /><circle cx="50%" cy="50%" r="45%" stroke="#10B981" strokeWidth="8" fill="transparent" strokeDasharray={`${Math.PI * 2 * 45 * (stats.winRate / 100)}, ${Math.PI * 2 * 45}`} strokeLinecap="round"/></svg><div className="absolute inset-0 flex flex-col items-center justify-center text-xs text-center"><div className="font-semibold">{stats.trades}</div><div className="text-gray-400">Trades</div><div className="mt-1 flex gap-2"><div><span className="text-emerald-400">{stats.wins}</span> W</div><div><span className="text-red-400">{stats.losses}</span> L</div></div></div></div> </div> </div> <div className="grid grid-cols-2 gap-4"> <div className="glass-card p-3"><p className="text-sm text-gray-400 flex items-center gap-1"><ArrowUpIcon className="text-emerald-400"/>Max Profit</p><p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.maxProfit, true, displaySymbol, usdIdr)}</p><p className="text-sm text-emerald-400">+{maxProfitPct.toFixed(2)}%</p></div> <div className="glass-card p-3"><p className="text-sm text-gray-400 flex items-center gap-1"><ArrowDownIcon className="text-red-400"/>Max Loss</p><p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.maxLoss, true, displaySymbol, usdIdr)}</p><p className="text-sm text-red-400">{maxLossPct.toFixed(2)}%</p></div> <div className="glass-card p-3"><p className="text-sm text-gray-400 flex items-center gap-1"><AvgProfitIcon className="text-gray-400 w-4 h-4"/>Avg. Profit</p><p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.avgProfit, true, displaySymbol, usdIdr)}</p></div> <div className="glass-card p-3"><p className="text-sm text-gray-400 flex items-center gap-1"><AvgLossIcon className="text-gray-400 w-4 h-4"/>Avg. Loss</p><p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.avgLoss, true, displaySymbol, usdIdr)}</p></div> </div> <div className="glass-card p-4"> <h3 className="font-semibold text-white flex items-center gap-1">Total Realized Gain <InfoIcon className="text-gray-400 w-3 h-3" /></h3> <p className={`text-2xl font-bold mt-1 ${stats.totalRealizedGain >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{stats.totalRealizedGain >= 0 ? '+' : ''}{formatCurrency(stats.totalRealizedGain, true, displaySymbol, usdIdr)}</p> <div className="h-48 mt-2"><AreaChart data={realizedGainSeries} displaySymbol={displaySymbol} range={chartRange} setRange={setChartRange} showTimeframes={false}/></div> <div className="mt-2 text-xs text-gray-400 border-t border-white/10 pt-2 space-y-1"> <div className="flex justify-between"><span>Realized Gain</span> <span className="text-emerald-400 font-semibold">{formatCurrency(realizedGainOnly, true, displaySymbol, usdIdr)}</span></div> <div className="flex justify-between"><span>Realized Loss</span> <span className="text-red-400 font-semibold">{formatCurrency(realizedLossOnly, true, displaySymbol, usdIdr)}</span></div> </div> </div> <div className="glass-card p-4"> <h3 className="font-semibold text-white mb-2">Top Gainer ({displaySymbol})</h3> <table className="w-full text-sm"> <thead className="text-gray-400 text-xs font-light"><tr><th className="text-left font-normal py-1">Code</th><th className="text-center font-normal py-1">Trades</th><th className="text-right font-normal py-1">P&L</th></tr></thead> <tbody>{topGainers.map(g => (<tr key={g.symbol} className="border-t border-white/10"><td className="py-2 flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center font-bold text-white text-xs">{g.symbol.charAt(0)}</div>{g.symbol}</td><td className="text-center py-2">{g.trades}</td><td className={`text-right py-2 font-semibold ${g.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{g.pnl >= 0 ? '+' : ''}{formatCurrency(g.pnl, true, displaySymbol, usdIdr)} ({g.pnlPct.toFixed(2)}%)</td></tr>))}</tbody> </table> </div> </div> );
+            
+            return ( 
+                <div className="p-4 space-y-6"> 
+                    <div className="glass-card p-4"> 
+                        <div className="flex items-center justify-between"> 
+                            <div>
+                                <p className="text-sm text-gray-400">Win Rate</p>
+                                <p className="text-3xl font-bold text-white mt-1">{stats.winRate.toFixed(2)}%</p>
+                            </div> 
+                            <div className="relative w-24 h-24">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="45%" stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="transparent" />
+                                    <circle cx="50%" cy="50%" r="45%" stroke="#10B981" strokeWidth="8" fill="transparent" strokeDasharray={`${Math.PI * 2 * 45 * (stats.winRate / 100)}, ${Math.PI * 2 * 45}`} strokeLinecap="round"/>
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-xs text-center">
+                                    <div className="font-semibold">{stats.trades}</div>
+                                    <div className="text-gray-400">Trades</div>
+                                    <div className="mt-1 flex gap-2">
+                                        <div><span className="text-emerald-400">{stats.wins}</span> W</div>
+                                        <div><span className="text-red-400">{stats.losses}</span> L</div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div> 
+                    </div> 
+                    <div className="grid grid-cols-2 gap-4"> 
+                        <div className="glass-card p-3">
+                            <p className="text-sm text-gray-400 flex items-center gap-1"><ArrowUpIcon className="text-emerald-400"/>Max Profit</p>
+                            <p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.maxProfit, true, displaySymbol, usdIdr)}</p>
+                            <p className="text-sm text-emerald-400">+{maxProfitPct.toFixed(2)}%</p>
+                        </div> 
+                        <div className="glass-card p-3">
+                            <p className="text-sm text-gray-400 flex items-center gap-1"><ArrowDownIcon className="text-red-400"/>Max Loss</p>
+                            <p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.maxLoss, true, displaySymbol, usdIdr)}</p>
+                            <p className="text-sm text-red-400">{maxLossPct.toFixed(2)}%</p>
+                        </div> 
+                        <div className="glass-card p-3">
+                            <p className="text-sm text-gray-400 flex items-center gap-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>Avg. Profit</p>
+                            <p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.avgProfit, true, displaySymbol, usdIdr)}</p>
+                        </div> 
+                        <div className="glass-card p-3">
+                            <p className="text-sm text-gray-400 flex items-center gap-1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v10"/><path d="M18 4v16"/><path d="M6 4v8"/></svg>Avg. Loss</p>
+                            <p className="text-base font-semibold text-white mt-1">{formatCurrency(stats.avgLoss, true, displaySymbol, usdIdr)}</p>
+                        </div> 
+                    </div> 
+                    <div className="glass-card p-4"> 
+                        <h3 className="font-semibold text-white flex items-center gap-1">Total Realized Gain <InfoIcon className="text-gray-400 w-3 h-3" /></h3> 
+                        <p className={`text-2xl font-bold mt-1 ${stats.totalRealizedGain >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{stats.totalRealizedGain >= 0 ? '+' : ''}{formatCurrency(stats.totalRealizedGain, true, displaySymbol, usdIdr)}</p> 
+                        <div className="h-48 mt-2"><AreaChart data={realizedGainSeries} displaySymbol={displaySymbol} range={chartRange} setRange={setChartRange} showTimeframes={false}/></div> 
+                        <div className="mt-2 text-xs text-gray-400 border-t border-white/10 pt-2 space-y-1"> 
+                            <div className="flex justify-between"><span>Realized Gain</span> <span className="text-emerald-400 font-semibold">{formatCurrency(realizedGainOnly, true, displaySymbol, usdIdr)}</span></div> 
+                            <div className="flex justify-between"><span>Realized Loss</span> <span className="text-red-400 font-semibold">{formatCurrency(realizedLossOnly, true, displaySymbol, usdIdr)}</span></div> 
+                        </div> 
+                    </div> 
+                    <div className="glass-card p-4"> 
+                        <h3 className="font-semibold text-white mb-2">Top Gainer ({displaySymbol})</h3> 
+                        <table className="w-full text-sm"> 
+                            <thead className="text-gray-400 text-xs font-light"><tr><th className="text-left font-normal py-1">Code</th><th className="text-center font-normal py-1">Trades</th><th className="text-right font-normal py-1">P&L</th></tr></thead> 
+                            <tbody>{topGainers.map(g => (<tr key={g.symbol} className="border-t border-white/10"><td className="py-2 flex items-center gap-2"><div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center font-bold text-white text-xs">{g.symbol.charAt(0)}</div>{g.symbol}</td><td className="text-center py-2">{g.trades}</td><td className={`text-right py-2 font-semibold ${g.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{g.pnl >= 0 ? '+' : ''}{formatCurrency(g.pnl, true, displaySymbol, usdIdr)} ({g.pnlPct.toFixed(2)}%)</td></tr>))}</tbody> 
+                        </table> 
+                    </div>
+                    <div className="glass-card p-4">
+                        <h3 className="font-semibold text-white mb-2">Trade History</h3>
+                        <div className="max-h-64 overflow-y-auto">
+                            <table className="w-full text-sm">
+                                <thead className="text-gray-400 text-xs font-light sticky top-0 bg-zinc-800/80 backdrop-blur-sm">
+                                    <tr>
+                                        <th className="text-left font-normal py-2 px-2">Date</th>
+                                        <th className="text-left font-normal py-2 px-2">Symbol</th>
+                                        <th className="text-right font-normal py-2 px-2">Qty</th>
+                                        <th className="text-right font-normal py-2 px-2">Realized P&L</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[...sells].sort((a,b) => b.date - a.date).map(tx => (
+                                        <tr key={tx.id} className="border-t border-white/10">
+                                            <td className="py-2 px-2 text-xs text-gray-400">{new Date(tx.date).toLocaleDateString()}</td>
+                                            <td className="py-2 px-2 font-semibold">{tx.symbol}</td>
+                                            <td className="py-2 px-2 text-right">{formatQty(tx.qty)}</td>
+                                            <td className={`py-2 px-2 text-right font-semibold ${tx.realized >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                {formatCurrency(tx.realized, true, displaySymbol, usdIdr)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {sells.length === 0 && (
+                                        <tr>
+                                            <td colSpan="4" className="text-center py-8 text-gray-500">No completed trades yet.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+            );
         };
         const HistoryView = ({ transactions, usdIdr, displaySymbol, onDeleteTransaction }) => (
             <div className="p-1 max-h-[70vh] overflow-y-auto">
@@ -1281,7 +1402,7 @@
                             <div key={d.name} className={`p-2 rounded-lg transition-colors duration-300 ${hoveredSegment === d.name ? 'bg-black/20' : ''}`} onMouseOver={() => setHoveredSegment(d.name)} onMouseOut={() => setHoveredSegment(null)}>
                                 <div className="flex justify-between items-center text-sm">
                                     <div className="flex items-center gap-3 w-2/5">
-                                        <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center font-bold text-white text-xs flex-shrink-0">
+                                        <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-xs flex-shrink-0">
                                             {d.icon}
                                         </div>
                                         <div className="flex-1 truncate">
