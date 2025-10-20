@@ -299,7 +299,8 @@
                        data-title="Project OmniFolio (v26)"
                        data-img="assets/assets1.jpg"
                        data-extra-img="assets/assets01.jpg"
-                       data-extra-img="assets/assets001.jpg"
+                       data-extra-img-2="assets/assets001.jpg"
+                       data-extra-img-3="assets/assets0001.jpg"
                        data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="LEAD DEVELOPER | UI/UX DESIGNER"
                        data-link="https://ademiando.com/portofolio/"
@@ -594,7 +595,11 @@ Key features include:
                     </div>
                 </div>`;
             if (data.extraImg) {
-                 caseStudyHTML += `<div class="mt-12"><p class="detail-label">[ SELECTED FRAMES | CONCEPT ART | MEDIA ]</p><img src="${data.extraImg}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover mt-6"></div>`;
+                caseStudyHTML += `<div class="mt-12 space-y-4"><p class="detail-label">[ SELECTED FRAMES | CONCEPT ART | MEDIA ]</p>
+                    <img src="${data.extraImg}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover mt-6">
+                    ${data.extraImg2 ? `<img src="${data.extraImg2}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">` : ''}
+                    ${data.extraImg3 ? `<img src="${data.extraImg3}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">` : ''}
+                </div>`;
             }
             caseStudyContainer.innerHTML = caseStudyHTML;
             
@@ -603,12 +608,12 @@ Key features include:
                 <div class="max-w-4xl mx-auto text-center">
                     <p class="detail-label">[ RELATED PROJECTS ]</p>
                     <div class="grid grid-cols-3 gap-4 mt-8">
-                        <a href="#" class="related-card" data-index="0"><img src="assets/assets1.jpg" class="w-full h-full object-cover"></a>
-                        <a href="#" class="related-card" data-index="1"><img src="assets/assets2.jpg" class="w-full h-full object-cover"></a>
-                        <a href="#" class="related-card" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card overflow-hidden" data-index="0"><img src="assets/assets1.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card overflow-hidden" data-index="1"><img src="assets/assets2.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card overflow-hidden" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
                     </div>
                 </div>
-                <div class="mt-12 py-4 bg-gray-900/50 flex justify-between items-center">
+                <div class="mt-12 py-4 flex justify-between items-center">
                     <button id="prev-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">← PREV</button>
                     <button id="back-to-home-btn" class="related-nav-btn text-sm tracking-widest">BACK TO HOME</button>
                     <button id="next-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">NEXT →</button>
@@ -663,7 +668,8 @@ Key features include:
                     img: nextCard.dataset.img, client: nextCard.dataset.client,
                     role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
                     briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
-                    viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg
+                    viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg,
+                    extraImg2: nextCard.dataset.extraImg2, extraImg3: nextCard.dataset.extraImg3
                 };
                 showProjectDetail(data, newIndex);
             });
@@ -693,7 +699,8 @@ Key features include:
                     img: card.dataset.img, client: card.dataset.client,
                     role: card.dataset.role, briefTitle: card.dataset.briefTitle,
                     briefText: card.dataset.briefText, link: card.dataset.link,
-                    viewLink: card.dataset.viewLink, extraImg: card.dataset.extraImg
+                    viewLink: card.dataset.viewLink, extraImg: card.dataset.extraImg,
+                    extraImg2: card.dataset.extraImg2, extraImg3: card.dataset.extraImg3
                 };
                 performTransition(() => showProjectDetail(data, index));
             });
@@ -713,17 +720,16 @@ Key features include:
                 e.preventDefault();
                 const cardIndex = parseInt(e.target.closest('.related-card').dataset.index);
                 if (cardIndex !== currentProjectIndex) {
-                    performTransition(() => {
-                        const nextCard = cards[cardIndex];
-                        const data = {
-                            category: nextCard.dataset.category, title: nextCard.dataset.title,
-                            img: nextCard.dataset.img, client: nextCard.dataset.client,
-                            role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
-                            briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
-                            viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg
-                        };
-                        showProjectDetail(data, cardIndex);
-                    });
+                     const nextCard = cards[cardIndex];
+                     const data = {
+                        category: nextCard.dataset.category, title: nextCard.dataset.title,
+                        img: nextCard.dataset.img, client: nextCard.dataset.client,
+                        role: nextCard.dataset.role, briefTitle: nextCard.dataset.briefTitle,
+                        briefText: nextCard.dataset.briefText, link: nextCard.dataset.link,
+                        viewLink: nextCard.dataset.viewLink, extraImg: nextCard.dataset.extraImg,
+                        extraImg2: nextCard.dataset.extraImg2, extraImg3: nextCard.dataset.extraImg3
+                    };
+                    performTransition(() => showProjectDetail(data, cardIndex));
                 }
             }
         });
@@ -857,4 +863,5 @@ Key features include:
     </script>
 </body>
 </html>
+
 
