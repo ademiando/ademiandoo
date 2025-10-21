@@ -2,193 +2,165 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joycebar - Pelacak Subsidi Karyawan</title>
-    <!-- Import Font dari Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Joycebar - Pelacak Subsidi (Stabil)</title>
+    <!-- Import Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Import Chart.js untuk visualisasi -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f8f9fa;
-            --surface-color: #ffffff;
-            --primary-accent: #007bff; /* Biru Joycebar */
-            --text-primary: #212529;
-            --text-secondary: #6c757d;
-            --border-color: #dee2e6;
-            --danger-color: #dc3545;
-            --success-color: #28a745;
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-accent: #f0b90b; /* Emas */
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --border-color: #333333;
+            --danger-color: #cf6679;
+            --success-color: #66bb6a;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
-            padding: 2rem;
+            padding: 1.5rem 1rem;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.5rem;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
+        header h1 { font-size: 1.5rem; font-weight: 600; }
+        .btn-export { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 0.9rem;}
         
-        .header-brand {
-            display: flex;
+        #employeeList { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .employee-card {
+            background-color: var(--surface-color);
+            border-radius: 12px; border: 1px solid var(--border-color);
+            padding: 1rem; display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto auto;
+            gap: 0.25rem 1rem;
             align-items: center;
-            gap: 1rem;
         }
+
+        .employee-card .name { grid-column: 1 / 2; font-size: 1.2rem; font-weight: 600; }
+        .employee-card .total-label { grid-column: 1 / 2; grid-row: 2 / 3; font-size: 0.8rem; color: var(--text-secondary); }
+        .employee-card .total-amount { grid-column: 1 / 2; grid-row: 3 / 4; font-size: 1.5rem; font-weight: 700; }
+        .employee-card .status { grid-column: 2 / 3; grid-row: 1 / 3; text-align: right; }
+        .employee-card .btn-details { grid-column: 2 / 3; grid-row: 3 / 4; align-self: end; }
+
+        .status-badge { font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; }
+        .status-sisa { color: #121212; background-color: var(--success-color); }
+        .status-bayar { color: #121212; background-color: var(--danger-color); }
         
-        .logo {
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary-accent);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
+        .btn-details { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem; border-radius: 8px; cursor: pointer; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
 
-        header h1 { font-size: 1.8rem; font-weight: 700; }
-        header h1 .subtitle { font-size: 1rem; color: var(--text-secondary); display: block; font-weight: 400; }
-
-        .btn {
-            padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;
-            font-weight: 600; font-size: 1rem; transition: all 0.2s ease;
+        #addTxBtn {
+            position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px;
+            background-color: var(--primary-accent); color: var(--bg-color);
+            border-radius: 50%; border: none; font-size: 2rem; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 999;
+            transition: transform 0.2s ease;
         }
-
-        .btn-primary { background-color: var(--primary-accent); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2); }
-        .btn-export { background-color: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); }
-
-        .card {
-            background-color: var(--surface-color); padding: 1.5rem; border-radius: 12px;
-            margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .table-wrapper { overflow-x: auto; }
-        #employeeTable { width: 100%; border-collapse: collapse; }
-        #employeeTable th, #employeeTable td {
-            padding: 1rem 1.5rem; text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-        #employeeTable th {
-            color: var(--text-secondary); font-weight: 600; text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-        #employeeTable tbody tr:last-child td { border-bottom: none; }
-        #employeeTable tbody tr:hover { background-color: #f8f9fa; }
-
-        .employee-name { font-weight: 600; font-size: 1.1rem; }
-        .status { font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.9rem; }
-        .status-sisa { color: #155724; background-color: #d4edda; }
-        .status-bayar { color: #721c24; background-color: #f8d7da; }
-        .btn-details { background: none; border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
-        .btn-details:hover { background-color: #e9ecef; }
-        
-        #tableBody:empty::after {
-            content: 'Belum ada data bulan ini. Klik "Tambah Transaksi" untuk memulai.';
-            display: table-cell; padding: 4rem; text-align: center;
-            color: var(--text-secondary); font-size: 1.2rem;
-        }
+        #addTxBtn:active { transform: scale(0.95); }
 
         /* --- Modal Styles --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+            background-color: rgba(0,0,0,0.7); display: flex; 
+            flex-direction: column; justify-content: flex-end;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
         }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         
         .modal-content {
-            background-color: var(--surface-color); padding: 2rem; border-radius: 12px;
-            width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transform: scale(0.95); transition: transform 0.3s ease;
+            background-color: var(--surface-color);
+            width: 100%; padding: 2.5rem 1.5rem 1.5rem;
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+            transform: translateY(100%); transition: transform 0.3s ease;
         }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-content h2 { margin-bottom: 1.5rem; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); }
-        .form-group input, .form-group textarea {
-            padding: 0.8rem; background-color: var(--bg-color); border: 1px solid var(--border-color);
-            border-radius: 8px; color: var(--text-primary); font-size: 1rem; font-family: 'Inter', sans-serif;
-        }
-        #txForm { display: flex; flex-direction: column; gap: 1rem; }
-        .form-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
-        .btn-secondary { background-color: #e9ecef; color: var(--text-primary); }
+        .modal-overlay.visible .modal-content { transform: translateY(0); }
 
-        /* --- Details Modal --- */
-        #detailsModalContent .transaction-list { max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-header h2 { font-size: 1.2rem; }
+        .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 2rem; cursor: pointer; line-height: 1; }
+        
+        #txForm { display: flex; flex-direction: column; gap: 1rem; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 0.5rem; font-weight: 500; color: var(--text-secondary); font-size: 0.9rem;}
+        .form-group input, .form-group textarea {
+            padding: 1rem; background-color: var(--bg-color); border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text-primary); font-size: 1rem; font-family: 'Poppins', sans-serif;
+        }
+        .btn-submit { padding: 1rem; font-size: 1rem; margin-top: 1rem; background-color: var(--primary-accent); color: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+        /* Details Modal */
+        #detailsList { max-height: 60vh; overflow-y: auto; padding-right: 10px; }
         .transaction-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
         .transaction-item:last-child { border-bottom: none; }
-        .item-icon { font-size: 1.5rem; color: var(--primary-accent); flex-shrink: 0; margin-top: 2px; }
         .item-info { flex-grow: 1; }
-        .item-info .item-desc { font-weight: 600; display: block; margin-bottom: 0.25rem; }
-        .item-info .item-date { font-size: 0.9rem; color: var(--text-secondary); }
+        .item-info .item-desc { font-weight: 500; display: block; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .item-info .item-date { font-size: 0.8rem; color: var(--text-secondary); }
         .item-amount { font-weight: 600; font-size: 1.1rem; white-space: nowrap; }
+        
+        /* Desktop responsive adjustments */
+        @media (min-width: 768px) {
+            body { padding: 2rem; }
+            #employeeList {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 1.5rem;
+            }
+            .modal-overlay { justify-content: center; align-items: center; }
+            .modal-content {
+                width: 90%; max-width: 500px;
+                border-radius: 12px;
+                transform: scale(0.95);
+            }
+            .modal-overlay.visible .modal-content { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <div class="header-brand">
-                <div class="logo">JB</div>
-                <h1>
-                    Joycebar
-                    <span class="subtitle">Pelacak Subsidi Karyawan</span>
-                </h1>
-            </div>
-            <div class="header-actions">
-                 <button class="btn btn-export" id="exportBtn">Export CSV</button>
-                 <button class="btn btn-primary" id="addTxBtn">Tambah Transaksi +</button>
-            </div>
+            <h1>Pelacak Subsidi</h1>
+            <button class="btn-export" id="exportBtn">Export CSV</button>
         </header>
 
         <main>
-            <div class="card">
-                <canvas id="txChart" style="max-height: 300px;"></canvas>
-            </div>
-            
-            <div class="card">
-                <div class="table-wrapper">
-                    <table id="employeeTable">
-                        <thead>
-                            <tr>
-                                <th>Nama Karyawan</th>
-                                <th>Total Terpakai (Bulan Ini)</th>
-                                <th>Status Subsidi</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            <!-- Data Karyawan akan di-generate oleh JS -->
-                        </tbody>
-                    </table>
-                </div>
+            <div id="employeeList">
+                <!-- Employee cards are generated by JavaScript -->
             </div>
         </main>
     </div>
 
-    <!-- Modal untuk menambah transaksi baru -->
+    <!-- Floating Action Button -->
+    <button id="addTxBtn">+</button>
+
+    <!-- Modal for adding transaction -->
     <div class="modal-overlay" id="txModal">
         <div class="modal-content">
-            <h2>Catat Transaksi Baru</h2>
+            <div class="modal-header">
+                <h2>Catat Transaksi</h2>
+                <button class="close-btn" data-modal-id="txModal">&times;</button>
+            </div>
             <form id="txForm" novalidate>
                 <div class="form-group">
                     <label for="date">Tanggal</label>
@@ -203,79 +175,71 @@
                     <input type="number" id="total" placeholder="cth: 50000" required>
                 </div>
                 <div class="form-group">
-                    <label for="items">Deskripsi / Menu yang dibeli</label>
+                    <label for="items">Deskripsi / Menu</label>
                     <textarea id="items" placeholder="cth: 1x Kopi Susu, 2x Roti Bakar" rows="3" required></textarea>
                 </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
+                <button type="submit" class="btn-submit">Simpan Transaksi</button>
             </form>
         </div>
     </div>
     
-    <!-- Modal untuk melihat rincian transaksi -->
+    <!-- Modal for viewing transaction details -->
     <div class="modal-overlay" id="detailsModal">
-        <div class="modal-content" id="detailsModalContent">
-            <h2 id="detailsModalTitle">Rincian Transaksi</h2>
-            <div class="transaction-list" id="detailsList"></div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="closeDetailsBtn">Tutup</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsModalTitle">Rincian Transaksi</h2>
+                <button class="close-btn" data-modal-id="detailsModal">&times;</button>
             </div>
+            <div id="detailsList"></div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Elemen DOM ---
-            const addTxBtn = document.getElementById('addTxBtn');
-            const exportBtn = document.getElementById('exportBtn');
-            const tableBody = document.getElementById('tableBody');
-            const chartCanvas = document.getElementById('txChart');
-
-            // --- Modal Input ---
-            const txModal = document.getElementById('txModal');
-            const txForm = document.getElementById('txForm');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const dateInput = document.getElementById('date');
-            const nameInput = document.getElementById('name');
-            const totalInput = document.getElementById('total');
-            const itemsInput = document.getElementById('items');
-
-            // --- Modal Rincian ---
-            const detailsModal = document.getElementById('detailsModal');
-            const detailsModalTitle = document.getElementById('detailsModalTitle');
-            const detailsList = document.getElementById('detailsList');
-            const closeDetailsBtn = document.getElementById('closeDetailsBtn');
-
-            // --- State & Konfigurasi Aplikasi ---
-            const STORAGE_KEY = 'joycebarSubsidyApp_v2';
+        // Self-invoking function to encapsulate the app logic
+        (() => {
+            // --- App State & Config ---
+            const STORAGE_KEY = 'joycebarSubsidyApp_v6_stable';
             const SUBSIDY_LIMIT = 600000;
             let allTransactions = [];
-            let txChart = null;
 
-            // --- Fungsi Utilitas ---
+            // --- DOM Element Selection ---
+            const employeeList = document.getElementById('employeeList');
+            const txModal = document.getElementById('txModal');
+            const detailsModal = document.getElementById('detailsModal');
+            const txForm = document.getElementById('txForm');
+            const detailsList = document.getElementById('detailsList');
+            const detailsModalTitle = document.getElementById('detailsModalTitle');
+
+            // --- Utility Functions ---
             const formatCurrency = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
-            const formatDate = (dateStr) => {
-                if (!dateStr) return '';
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric'});
-            };
+            const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
             const normalizeName = (name) => name.trim().toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
 
-            // --- Logika Modal ---
+            // --- Modal Logic ---
             const showModal = (modal) => modal.classList.add('visible');
             const hideModal = (modal) => modal.classList.remove('visible');
 
-            // --- Penyimpanan Data ---
-            const saveData = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(allTransactions));
+            // --- Data Persistence ---
+            const saveData = () => {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(allTransactions));
+                } catch (e) {
+                    console.error("Gagal menyimpan data:", e);
+                    alert("Gagal menyimpan data.");
+                }
+            };
             const loadData = () => {
-                const data = localStorage.getItem(STORAGE_KEY);
-                allTransactions = data ? JSON.parse(data) : [];
+                try {
+                    const data = localStorage.getItem(STORAGE_KEY);
+                    allTransactions = data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error("Gagal memuat data:", e);
+                    allTransactions = [];
+                }
                 renderDashboard();
             };
 
-            // --- Logika Render Utama ---
+            // --- Core Rendering Logic ---
             const renderDashboard = () => {
                 const now = new Date();
                 const transactionsThisMonth = allTransactions.filter(tx => {
@@ -289,122 +253,88 @@
                     acc[nameKey].total += tx.total;
                     return acc;
                 }, {});
-
-                renderTable(groupedByName);
-                renderChart(groupedByName);
+                
+                renderEmployeeList(groupedByName);
             };
             
-            const renderTable = (groupedData) => {
-                tableBody.innerHTML = '';
+            const renderEmployeeList = (groupedData) => {
+                employeeList.innerHTML = '';
                 const sortedNames = Object.keys(groupedData).sort();
 
-                if (sortedNames.length === 0) return;
+                if (sortedNames.length === 0) {
+                    employeeList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem 0;">Belum ada transaksi bulan ini. Tekan tombol + untuk memulai.</p>';
+                    return;
+                }
 
                 sortedNames.forEach(name => {
                     const totalSpent = groupedData[name].total;
                     const balance = SUBSIDY_LIMIT - totalSpent;
-                    const statusHTML = balance >= 0 ? 
-                        `<span class="status status-sisa">Sisa: ${formatCurrency(balance)}</span>` : 
-                        `<span class="status status-bayar">Bayar: ${formatCurrency(Math.abs(balance))}</span>`;
+                    const statusHTML = balance >= 0 ?
+                        `<span class="status-badge status-sisa">Sisa ${formatCurrency(balance)}</span>` :
+                        `<span class="status-badge status-bayar">Bayar ${formatCurrency(Math.abs(balance))}</span>`;
                     
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><span class="employee-name">${name}</span></td>
-                        <td>${formatCurrency(totalSpent)}</td>
-                        <td>${statusHTML}</td>
-                        <td><button class="btn-details" data-name="${name}">Lihat Rincian</button></td>
+                    const card = document.createElement('div');
+                    card.className = 'employee-card';
+                    card.innerHTML = `
+                        <h3 class="name">${name}</h3>
+                        <div class="status">${statusHTML}</div>
+                        <span class="total-label">Total Terpakai</span>
+                        <span class="total-amount">${formatCurrency(totalSpent)}</span>
+                        <button class="btn-details" data-name="${name}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                        </button>
                     `;
-                    tableBody.appendChild(row);
+                    employeeList.appendChild(card);
                 });
             };
-
-            const renderChart = (groupedData) => {
-                if (txChart) txChart.destroy();
-                
-                const labels = Object.keys(groupedData).sort();
-                const data = labels.map(name => groupedData[name].total);
-                
-                txChart = new Chart(chartCanvas, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Total Pemakaian Subsidi', data,
-                            backgroundColor: 'rgba(0, 123, 255, 0.8)',
-                            borderColor: 'rgba(0, 123, 255, 1)',
-                            borderWidth: 1, borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        scales: {
-                            y: { beginAtZero: true, ticks: { color: var(--text-secondary), callback: (v) => `Rp ${v/1000}k` }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                            x: { ticks: { color: var(--text-secondary) }, grid: { display: false } }
-                        },
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `Total: ${formatCurrency(c.raw)}` } } }
-                    }
-                });
-            };
-
-            // --- Penanganan Event ---
-            const handleAddTransaction = (e) => {
+            
+            // --- Event Handlers ---
+            const handleFormSubmit = (e) => {
                 e.preventDefault();
-                const nameValue = nameInput.value.trim();
-                const totalValue = parseFloat(totalInput.value);
-                const itemsValue = itemsInput.value.trim();
+                const date = txForm.querySelector('#date').value;
+                const name = txForm.querySelector('#name').value.trim();
+                const total = parseFloat(txForm.querySelector('#total').value);
+                const items = txForm.querySelector('#items').value.trim();
 
-                if(!nameValue || !totalValue || totalValue <= 0 || !itemsValue) {
-                    alert('Semua kolom wajib diisi.'); return;
+                if (!date || !name || isNaN(total) || total <= 0 || !items) {
+                    alert('Semua kolom wajib diisi dengan benar.'); return;
                 }
 
-                allTransactions.push({
-                    id: Date.now(),
-                    date: dateInput.value,
-                    name: normalizeName(nameValue),
-                    total: totalValue,
-                    items: itemsValue
-                });
+                allTransactions.push({ id: Date.now(), date, name, total, items });
                 saveData();
                 renderDashboard();
                 hideModal(txModal);
             };
 
-            const handleShowDetails = (e) => {
-                if (!e.target.classList.contains('btn-details')) return;
-                
-                const name = e.target.dataset.name;
+            const handleShowDetails = (name) => {
                 const now = new Date();
-                const transactionsForUserThisMonth = allTransactions.filter(tx => {
-                    const txDate = new Date(tx.date);
-                    return normalizeName(tx.name) === name && txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
-                }).sort((a, b) => new Date(b.date) - new Date(a.date));
+                const transactionsForUser = allTransactions
+                    .filter(tx => {
+                        const txDate = new Date(tx.date);
+                        return normalizeName(tx.name) === name && txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+                    })
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                detailsModalTitle.textContent = `Rincian Transaksi - ${name}`;
-                detailsList.innerHTML = transactionsForUserThisMonth.map(tx => `
+                detailsModalTitle.textContent = `Rincian - ${name}`;
+                detailsList.innerHTML = transactionsForUser.length > 0 ? transactionsForUser.map(tx => `
                     <div class="transaction-item">
-                        <div class="item-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        </div>
                         <div class="item-info">
                             <span class="item-desc">${tx.items}</span>
                             <span class="item-date">${formatDate(tx.date)}</span>
                         </div>
                         <span class="item-amount">${formatCurrency(tx.total)}</span>
-                    </div>
-                `).join('');
+                    </div>`).join('') : '<p style="color: var(--text-secondary);">Tidak ada rincian transaksi.</p>';
                 
                 showModal(detailsModal);
             };
 
             const handleExport = () => {
                 if (allTransactions.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
-                const headers = 'ID Transaksi,Tanggal,Nama,Items,Total\n';
+                const headers = 'ID Transaksi,Tanggal,Nama,Deskripsi,Total\n';
                 const rows = [...allTransactions]
                     .sort((a,b) => new Date(a.date) - new Date(b.date))
-                    .map(tx => {
-                        const sanitizedItems = `"${(tx.items || '').replace(/"/g, '""')}"`;
-                        return `${tx.id},${tx.date},${tx.name},${sanitizedItems},${tx.total}`;
-                    }).join('\n');
+                    .map(tx => `"${tx.id}","${tx.date}","${normalizeName(tx.name)}","${(tx.items || '').replace(/"/g, '""')}","${tx.total}"`)
+                    .join('\n');
                 
                 const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
@@ -415,26 +345,43 @@
                 document.body.removeChild(link);
             };
 
-            // --- Pendaftaran Event Listener ---
-            addTxBtn.addEventListener('click', () => {
-                txForm.reset();
-                dateInput.valueAsDate = new Date();
-                showModal(txModal);
-                setTimeout(() => nameInput.focus(), 50);
+            // --- Global Event Listener (Event Delegation) ---
+            document.addEventListener('click', (e) => {
+                // Show Add Transaction Modal
+                if (e.target.closest('#addTxBtn')) {
+                    txForm.reset();
+                    txForm.querySelector('#date').valueAsDate = new Date();
+                    showModal(txModal);
+                    return;
+                }
+
+                // Show Details Modal
+                const detailsButton = e.target.closest('.btn-details');
+                if (detailsButton) {
+                    handleShowDetails(detailsButton.dataset.name);
+                    return;
+                }
+
+                // Close Modals
+                const closeButton = e.target.closest('.close-btn');
+                if (closeButton) {
+                    hideModal(document.getElementById(closeButton.dataset.modalId));
+                    return;
+                }
+                
+                // Export Data
+                if (e.target.closest('#exportBtn')) {
+                    handleExport();
+                    return;
+                }
             });
-            cancelBtn.addEventListener('click', () => hideModal(txModal));
-            txModal.addEventListener('click', (e) => { if (e.target === txModal) hideModal(txModal); });
-            txForm.addEventListener('submit', handleAddTransaction);
+
+            // Form submission
+            txForm.addEventListener('submit', handleFormSubmit);
             
-            tableBody.addEventListener('click', handleShowDetails);
-            closeDetailsBtn.addEventListener('click', () => hideModal(detailsModal));
-            detailsModal.addEventListener('click', (e) => { if (e.target === detailsModal) hideModal(detailsModal); });
-
-            exportBtn.addEventListener('click', handleExport);
-
-            // --- Muat Data Awal ---
+            // Initial Load
             loadData();
-        });
+        })();
     </script>
 </body>
 </html>
