@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Joycebar - Pelacak Subsidi (Stabil)</title>
+    <title>Joycebar - Pelacak Subsidi (Pro)</title>
     <!-- Import Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +46,7 @@
         
         #employeeList { display: flex; flex-direction: column; gap: 1rem; }
         
+        /* Membuat kartu bisa diklik */
         .employee-card {
             background-color: var(--surface-color);
             border-radius: 12px; border: 1px solid var(--border-color);
@@ -54,19 +55,28 @@
             grid-template-rows: auto auto auto;
             gap: 0.25rem 1rem;
             align-items: center;
+            cursor: pointer; /* Menambahkan cursor pointer */
+            transition: background-color 0.2s ease;
+        }
+        .employee-card:hover {
+            background-color: #2a2a2a;
         }
 
         .employee-card .name { grid-column: 1 / 2; font-size: 1.2rem; font-weight: 600; }
         .employee-card .total-label { grid-column: 1 / 2; grid-row: 2 / 3; font-size: 0.8rem; color: var(--text-secondary); }
         .employee-card .total-amount { grid-column: 1 / 2; grid-row: 3 / 4; font-size: 1.5rem; font-weight: 700; }
         .employee-card .status { grid-column: 2 / 3; grid-row: 1 / 3; text-align: right; }
-        .employee-card .btn-details { grid-column: 2 / 3; grid-row: 3 / 4; align-self: end; }
+        .employee-card .btn-add-for-user { grid-column: 2 / 3; grid-row: 3 / 4; align-self: end; }
 
         .status-badge { font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; white-space: nowrap; }
         .status-sisa { color: #121212; background-color: var(--success-color); }
         .status-bayar { color: #121212; background-color: var(--danger-color); }
         
-        .btn-details { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 0.5rem; border-radius: 8px; cursor: pointer; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+        .btn-add-for-user { 
+            background: none; border: 1px solid var(--border-color); color: var(--text-secondary); 
+            padding: 0.5rem; border-radius: 8px; cursor: pointer; width: 40px; height: 40px; 
+            display: flex; justify-content: center; align-items: center; z-index: 10;
+        }
 
         #addTxBtn {
             position: fixed; bottom: 2rem; right: 2rem; width: 60px; height: 60px;
@@ -111,12 +121,18 @@
 
         /* Details Modal */
         #detailsList { max-height: 60vh; overflow-y: auto; padding-right: 10px; }
-        .transaction-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .transaction-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color); align-items: center; }
         .transaction-item:last-child { border-bottom: none; }
         .item-info { flex-grow: 1; }
         .item-info .item-desc { font-weight: 500; display: block; margin-bottom: 0.25rem; white-space: pre-wrap; }
         .item-info .item-date { font-size: 0.8rem; color: var(--text-secondary); }
         .item-amount { font-weight: 600; font-size: 1.1rem; white-space: nowrap; }
+        .btn-delete-tx {
+            background-color: var(--danger-color); color: var(--bg-color);
+            border: none; border-radius: 50%; width: 30px; height: 30px;
+            font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; line-height: 1;
+        }
         
         /* Desktop responsive adjustments */
         @media (min-width: 768px) {
@@ -223,19 +239,13 @@
             const saveData = () => {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(allTransactions));
-                } catch (e) {
-                    console.error("Gagal menyimpan data:", e);
-                    alert("Gagal menyimpan data.");
-                }
+                } catch (e) { console.error("Gagal menyimpan data:", e); alert("Gagal menyimpan data."); }
             };
             const loadData = () => {
                 try {
                     const data = localStorage.getItem(STORAGE_KEY);
                     allTransactions = data ? JSON.parse(data) : [];
-                } catch (e) {
-                    console.error("Gagal memuat data:", e);
-                    allTransactions = [];
-                }
+                } catch (e) { console.error("Gagal memuat data:", e); allTransactions = []; }
                 renderDashboard();
             };
 
@@ -275,13 +285,14 @@
                     
                     const card = document.createElement('div');
                     card.className = 'employee-card';
+                    card.dataset.name = name; // Menambahkan data-name ke kartu
                     card.innerHTML = `
                         <h3 class="name">${name}</h3>
                         <div class="status">${statusHTML}</div>
                         <span class="total-label">Total Terpakai</span>
                         <span class="total-amount">${formatCurrency(totalSpent)}</span>
-                        <button class="btn-details" data-name="${name}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                        <button class="btn-add-for-user" data-name="${name}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>
                     `;
                     employeeList.appendChild(card);
@@ -323,9 +334,24 @@
                             <span class="item-date">${formatDate(tx.date)}</span>
                         </div>
                         <span class="item-amount">${formatCurrency(tx.total)}</span>
+                        <button class="btn-delete-tx" data-id="${tx.id}" title="Hapus Transaksi">&times;</button>
                     </div>`).join('') : '<p style="color: var(--text-secondary);">Tidak ada rincian transaksi.</p>';
                 
                 showModal(detailsModal);
+            };
+            
+            const handleDeleteTransaction = (txId) => {
+                if (!confirm('Anda yakin ingin menghapus transaksi ini?')) return;
+                
+                allTransactions = allTransactions.filter(tx => tx.id !== txId);
+                saveData();
+                renderDashboard();
+                hideModal(detailsModal); // Tutup modal setelah menghapus
+                // Optional: Buka kembali modal rincian jika masih ada item
+                // const name = detailsModalTitle.textContent.replace('Rincian - ', '');
+                // if (allTransactions.some(tx => normalizeName(tx.name) === name)) {
+                //    handleShowDetails(name);
+                // }
             };
 
             const handleExport = () => {
@@ -347,7 +373,7 @@
 
             // --- Global Event Listener (Event Delegation) ---
             document.addEventListener('click', (e) => {
-                // Show Add Transaction Modal
+                // Buka modal tambah transaksi (Tombol FAB)
                 if (e.target.closest('#addTxBtn')) {
                     txForm.reset();
                     txForm.querySelector('#date').valueAsDate = new Date();
@@ -355,17 +381,41 @@
                     return;
                 }
 
-                // Show Details Modal
-                const detailsButton = e.target.closest('.btn-details');
-                if (detailsButton) {
-                    handleShowDetails(detailsButton.dataset.name);
+                // Buka modal tambah transaksi untuk user tertentu (Tombol + di kartu)
+                const addForUserBtn = e.target.closest('.btn-add-for-user');
+                if (addForUserBtn) {
+                    txForm.reset();
+                    txForm.querySelector('#date').valueAsDate = new Date();
+                    txForm.querySelector('#name').value = addForUserBtn.dataset.name; // Langsung isi nama
+                    showModal(txModal);
+                    txForm.querySelector('#total').focus(); // Fokus ke input total
+                    return;
+                }
+                
+                // Hapus transaksi individual
+                const deleteTxBtn = e.target.closest('.btn-delete-tx');
+                if (deleteTxBtn) {
+                    handleDeleteTransaction(parseInt(deleteTxBtn.dataset.id));
                     return;
                 }
 
-                // Close Modals
+                // Buka modal rincian dengan klik kartu (pastikan bukan tombol + yang diklik)
+                const employeeCard = e.target.closest('.employee-card');
+                if (employeeCard && !e.target.closest('.btn-add-for-user')) {
+                    handleShowDetails(employeeCard.dataset.name);
+                    return;
+                }
+
+                // Tutup modal dengan tombol close
                 const closeButton = e.target.closest('.close-btn');
                 if (closeButton) {
                     hideModal(document.getElementById(closeButton.dataset.modalId));
+                    return;
+                }
+                
+                // Menutup modal dengan mengklik area overlay
+                if (e.target.classList.contains('modal-overlay')) {
+                    hideModal(e.target);
                     return;
                 }
                 
@@ -385,4 +435,5 @@
     </script>
 </body>
 </html>
+
 
