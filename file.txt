@@ -303,8 +303,8 @@
                        data-extra-img-3="assets/assets0001.jpg"
                        data-client="PERSONAL PROJECT (SELF-DIRECTED)" 
                        data-role="LEAD DEVELOPER | UI/UX DESIGNER"
-                       data-link="https://ademiando.com/portofolio/"
-                       data-view-link="https://ademiando.com/portofolio/"
+                       data-link="https://bloomboard-two.vercel.app/dashboard/"
+                       data-view-link="https://bloomboard-two.vercel.app/dashboard/"
                        data-brief-title="An All-in-One Financial Dashboard"
                        data-brief-text="This project is a comprehensive portfolio dashboard application designed to track diverse asset classes within a single, cohesive interface. Built as a single-page application (SPA) using React, it serves as a sophisticated personal wealth management tool.
 
