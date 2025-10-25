@@ -316,7 +316,6 @@ Key features include:
 - Dynamic Data Visualization: Features a portfolio equity curve, asset allocation breakdowns (by sector and individual asset), and price sparklines for each holding.
 - Full Portfolio Management: Users can add/withdraw balances, import/export their entire transaction history via CSV files, and toggle the display currency between IDR and USD.
 - In-Depth Asset Analysis: Each asset has a detail modal that integrates a full TradingView widget for in-depth technical analysis.">
-                        <!-- Kartu ini sekarang kembali menampilkan gambar asli -->
                         <img src="assets/assets1.jpg" alt="Project OmniFolio" class="w-full h-full object-cover card-image">
                     </a>
                      <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
@@ -541,31 +540,16 @@ Key features include:
             document.getElementById('detail-category').textContent = data.category;
             document.getElementById('detail-title').textContent = data.title;
             
-            // --- PERUBAHAN JAVASCRIPT ---
+            // --- BAGIAN MEDIA UTAMA (DIUBAH) ---
+            // Logika if/else dihapus. Sekarang selalu memuat data.img.
             const mediaContainer = document.getElementById('detail-media-container');
             mediaContainer.innerHTML = ''; 
-
-            if (data.title === "Project OmniFolio (v26)") {
-                // Jika ini adalah Project OmniFolio, muat video
-                const videoFrame = document.createElement('iframe');
-                videoFrame.className = "w-full aspect-video"; 
-                
-                // URL DIPERBARUI DENGAN ID BARU DAN PARAMETER PLAYLIST
-                videoFrame.src = "https://www.youtube.com/embed/4clvParJ1iw?autoplay=1&mute=1&controls=0&rel=0&iv_load_policy=3&modestbranding=1&loop=1&playlist=4clvParJ1iw";
-                
-                videoFrame.frameBorder = "0";
-                videoFrame.allow = "autoplay; encrypted-media";
-                videoFrame.allowFullscreen = true;
-                mediaContainer.appendChild(videoFrame);
-            } else {
-                // Jika proyek lain, muat gambar seperti biasa
-                const image = document.createElement('img');
-                image.src = data.img;
-                image.alt = "Project main image";
-                image.className = "w-full h-full object-cover";
-                mediaContainer.appendChild(image);
-            }
-            // --- AKHIR PERUBAHAN JAVASCRIPT ---
+            const image = document.createElement('img');
+            image.src = data.img; // Ini akan memuat assets/assets1.jpg untuk OmniFolio
+            image.alt = "Project main image";
+            image.className = "w-full h-full object-cover";
+            mediaContainer.appendChild(image);
+            // --- AKHIR BAGIAN MEDIA UTAMA ---
 
             document.getElementById('detail-client').textContent = data.client;
             document.getElementById('detail-role').textContent = data.role;
@@ -609,6 +593,7 @@ Key features include:
                 iconLinkContainer.appendChild(linkIcon);
             }
             
+            // --- BAGIAN CASE STUDY (DIUBAH) ---
             const caseStudyContainer = document.getElementById('case-study-section');
             caseStudyContainer.innerHTML = '';
             
@@ -628,14 +613,30 @@ Key features include:
                         </a>
                     </div>
                 </div>`;
+            
+            // Logika baru untuk mengganti gambar dengan video
             if (data.extraImg) {
                  caseStudyHTML += `<div class="mt-12 space-y-4"><p class="detail-label">[ FRAMEWORK | CONCEPT ART | VISUAL ]</p>
-                    <img src="${data.extraImg}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover mt-6">
-                    ${data.extraImg2 ? `<img src="${data.extraImg2}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">` : ''}
-                    ${data.extraImg3 ? `<img src="${data.extraImg3}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">` : ''}
-                </div>`;
+                    <img src="${data.extraImg}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover mt-6">`; // Ini assets01.jpg
+                
+                 // Logika untuk mengganti assets001.jpg (data.extraImg2) dengan video
+                 if (data.title === "Project OmniFolio (v26)") {
+                    // Ganti assets001.jpg dengan video
+                    caseStudyHTML += `<iframe class="w-full aspect-video" src="https://www.youtube.com/embed/4clvParJ1iw?autoplay=1&mute=1&controls=0&rel=0&iv_load_policy=3&modestbranding=1&loop=1&playlist=4clvParJ1iw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                 } else if (data.extraImg2) {
+                    // Perilaku normal untuk proyek lain
+                    caseStudyHTML += `<img src="${data.extraImg2}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">`;
+                 }
+                 
+                 // Tetap tampilkan assets0001.jpg (data.extraImg3)
+                 if (data.extraImg3) {
+                    caseStudyHTML += `<img src="${data.extraImg3}" alt="Selected frames for ${data.title}" class="w-full h-full object-cover">`;
+                 }
+                 
+                caseStudyHTML += `</div>`;
             }
             caseStudyContainer.innerHTML = caseStudyHTML;
+            // --- AKHIR BAGIAN CASE STUDY ---
             
             const relatedProjectsContainer = document.getElementById('related-projects-section');
             relatedProjectsContainer.innerHTML = `
@@ -644,7 +645,7 @@ Key features include:
                     <div class="grid grid-cols-3 gap-4 mt-8">
                         <a href="#" class="related-card overflow-hidden" data-index="0"><img src="assets/assets1.jpg" class="w-full h-full object-cover"></a>
                         <a href="#" class="related-card overflow-hidden" data-index="1"><img src="assets/assets2.jpg" class="w-full h-full object-cover"></a>
-                        <a href="#" class="related-card overflow-hidden" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card overflow-hidden" data-index="2"><img src="assets.assets3.jpg" class="w-full h-full object-cover"></a>
                     </div>
                 </div>
                 <div class="mt-12 py-4 flex justify-between items-center">
@@ -676,7 +677,6 @@ Key features include:
                 el.classList.remove('visible');
             });
             
-            // Saat detail ditutup, hapus media apa pun untuk menghentikan video
             const mediaContainer = document.getElementById('detail-media-container');
             mediaContainer.innerHTML = '';
         }
@@ -733,12 +733,18 @@ Key features include:
             card.addEventListener('click', (e) => {
                 e.preventDefault();
                 const data = {
-                    category: card.dataset.category, title: card.dataset.title,
-                    img: card.dataset.img, client: card.dataset.client,
-                    role: card.dataset.role, briefTitle: card.dataset.briefTitle,
-                    briefText: card.dataset.briefText, link: card.dataset.link,
-                    viewLink: card.dataset.viewLink, extraImg: card.dataset.extraImg,
-                    extraImg2: card.dataset.extraImg2, extraImg3: card.dataset.extraImg3
+                    category: card.dataset.category, 
+                    title: card.dataset.title,
+                    img: card.dataset.img, 
+                    client: card.dataset.client,
+                    role: card.dataset.role, 
+                    briefTitle: card.dataset.briefTitle,
+                    briefText: card.dataset.briefText, 
+                    link: card.dataset.link,
+                    viewLink: card.dataset.viewLink, 
+                    extraImg: card.dataset.extraImg,
+                    extraImg2: card.dataset.extraImg2, 
+                    extraImg3: card.dataset.extraImg3
                 };
                 performTransition(() => showProjectDetail(data, index));
             });
@@ -814,6 +820,7 @@ Key features include:
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
+        // ADEGAN 1: MONOLITH
         function createMonolithScene() {
             scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
             camera.position.z = 7;
@@ -835,36 +842,7 @@ Key features include:
             };
         }
 
-        function createTectonicScene() {
-            camera.position.set(0, 4, 6);
-            camera.lookAt(0, 0, 0);
-            scene.fog = new THREE.FogExp2(0x0A0A12, 0.08);
-            const geometry = new THREE.PlaneGeometry(30, 30, 150, 150);
-            const material = new THREE.MeshStandardMaterial({ color: 0x030712, metalness: 0.8, roughness: 0.6 });
-            const plane = new THREE.Mesh(geometry, material);
-            plane.rotation.x = -Math.PI / 2;
-            scene.add(plane);
-            const originalPositions = new Float32Array(geometry.attributes.position.array);
-            const light1 = new THREE.PointLight(0x5b21b6, 3, 15);
-            light1.position.set(-8, 2, 0);
-            scene.add(light1);
-            const light2 = new THREE.PointLight(0x155e75, 3, 15);
-            light2.position.set(8, 2, 0);
-            scene.add(light2);
-            animationLoop = () => {
-                const t = clock.getElapsedTime();
-                const positions = geometry.attributes.position.array;
-                for (let i = 0; i < positions.length / 3; i++) {
-                    const x = originalPositions[i * 3], y = originalPositions[i * 3 + 1];
-                    const wave1 = Math.sin(x * 0.4 + t * 0.5) * 0.4, wave2 = Math.sin(y * 0.3 + t * 0.3) * 0.4;
-                    positions[i * 3 + 2] = wave1 + wave2;
-                }
-                geometry.attributes.position.needsUpdate = true;
-                light1.position.x = Math.sin(t * 0.5) * 8;
-                light2.position.x = Math.cos(t * 0.3) * -8;
-            };
-        }
-        
+        // ADEGAN 2: RINGS
         function createRingsScene() {
             camera.position.set(0, 3, 7);
             camera.lookAt(0, 0, 0);
@@ -889,6 +867,77 @@ Key features include:
                 ringsGroup.rotation.z = t * 0.02;
             };
         }
+        
+        // ADEGAN 3: CRYSTAL CORE
+        function createCrystalCoreScene() {
+            camera.position.set(0, 0, 8);
+            camera.lookAt(0, 0, 0);
+            scene.fog = new THREE.Fog(0x0A0A12, 5, 15);
+
+            const artifactGroup = new THREE.Group();
+            scene.add(artifactGroup);
+
+            // Inti Kristal
+            const coreGeometry = new THREE.IcosahedronGeometry(1.5, 0);
+            const coreMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xa5b4fc, 
+                metalness: 0.9, 
+                roughness: 0.1, 
+                flatShading: true 
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            artifactGroup.add(core);
+
+            // Partikel yang mengorbit
+            const particleGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+            const particleMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff, 
+                metalness: 0.5, 
+                roughness: 0.5 
+            });
+            const particles = new THREE.Group();
+            for (let i = 0; i < 70; i++) {
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                
+                const phi = Math.random() * Math.PI * 2;
+                const theta = Math.random() * Math.PI;
+                const radius = 2.5 + Math.random() * 1.5;
+                
+                particle.position.setFromSphericalCoords(radius, phi, theta);
+                particles.add(particle);
+            }
+            artifactGroup.add(particles);
+
+            // Pencahayaan Sinematik
+            const light1 = new THREE.PointLight(0x7e22ce, 10, 20); // Ungu
+            light1.position.set(5, 5, 5);
+            scene.add(light1);
+            
+            const light2 = new THREE.PointLight(0x0e7490, 10, 20); // Cyan
+            light2.position.set(-5, -5, -5);
+            scene.add(light2);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+            // Animasi
+            animationLoop = () => {
+                const t = clock.getElapsedTime();
+                
+                artifactGroup.rotation.y = t * 0.2;
+                artifactGroup.rotation.x = t * 0.1;
+                
+                core.rotation.y = -t * 0.3;
+                core.rotation.z = t * 0.15;
+                
+                particles.rotation.y += 0.003;
+                particles.rotation.z -= 0.002;
+
+                light1.position.x = Math.sin(t * 0.5) * 8;
+                light1.position.z = Math.cos(t * 0.5) * 8;
+                light2.position.x = Math.sin(t * 0.3) * -8;
+                light2.position.z = Math.cos(t * 0.3) * -8;
+            };
+        }
 
         function animate() {
             requestAnimationFrame(animate);
@@ -897,8 +946,11 @@ Key features include:
         }
 
         initBaseScene();
-        const scenes = [createMonolithScene, createTectonicScene, createRingsScene];
+        
+        // Daftar adegan yang benar
+        const scenes = [createMonolithScene, createRingsScene, createCrystalCoreScene];
         scenes[Math.floor(Math.random() * scenes.length)]();
+        
         animate();
     </script>
 </body>
