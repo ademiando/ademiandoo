@@ -361,11 +361,9 @@ Key features include:
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
             
-            <!-- PERUBAHAN HTML: <img id="detail-img"> diganti dengan <div> container -->
             <div id="detail-media-container" class="mt-12 overflow-hidden rounded-none content-reveal">
                 <!-- Konten (video atau gambar) akan dimasukkan oleh JavaScript di sini -->
             </div>
-            <!-- AKHIR PERUBAHAN HTML -->
             
             <div id="detail-icon-link-container" class="text-center mt-4 content-reveal"></div>
 
@@ -544,15 +542,17 @@ Key features include:
             document.getElementById('detail-title').textContent = data.title;
             
             // --- PERUBAHAN JAVASCRIPT ---
-            // Logika untuk memuat video atau gambar
             const mediaContainer = document.getElementById('detail-media-container');
-            mediaContainer.innerHTML = ''; // Kosongkan container
+            mediaContainer.innerHTML = ''; 
 
             if (data.title === "Project OmniFolio (v26)") {
                 // Jika ini adalah Project OmniFolio, muat video
                 const videoFrame = document.createElement('iframe');
-                videoFrame.className = "w-full aspect-video"; // Gunakan aspect-video untuk rasio
-                videoFrame.src = "https://youtu.be/4clvParJ1iw?si=YBRasOvoQT7V2W_5";
+                videoFrame.className = "w-full aspect-video"; 
+                
+                // URL DIPERBARUI DENGAN ID BARU DAN PARAMETER PLAYLIST
+                videoFrame.src = "https://www.youtube.com/embed/4clvParJ1iw?autoplay=1&mute=1&controls=0&rel=0&iv_load_policy=3&modestbranding=1&loop=1&playlist=4clvParJ1iw";
+                
                 videoFrame.frameBorder = "0";
                 videoFrame.allow = "autoplay; encrypted-media";
                 videoFrame.allowFullscreen = true;
