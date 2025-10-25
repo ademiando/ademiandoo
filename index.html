@@ -316,6 +316,7 @@ Key features include:
 - Dynamic Data Visualization: Features a portfolio equity curve, asset allocation breakdowns (by sector and individual asset), and price sparklines for each holding.
 - Full Portfolio Management: Users can add/withdraw balances, import/export their entire transaction history via CSV files, and toggle the display currency between IDR and USD.
 - In-Depth Asset Analysis: Each asset has a detail modal that integrates a full TradingView widget for in-depth technical analysis.">
+                        <!-- Kartu ini sekarang kembali menampilkan gambar asli -->
                         <img src="assets/assets1.jpg" alt="Project OmniFolio" class="w-full h-full object-cover card-image">
                     </a>
                      <a href="#" class="card block bg-black/30 overflow-hidden shadow-2xl shadow-black/20 rounded-none reveal"
@@ -359,9 +360,12 @@ Key features include:
                 <p id="detail-category" class="text-sm tracking-[0.2em] text-gray-400"></p>
                 <h1 id="detail-title" class="text-3xl sm:text-4xl lg:text-5xl font-light text-white mt-4"></h1>
             </div>
-            <div class="mt-12 overflow-hidden rounded-none content-reveal">
-                <img id="detail-img" src="" alt="Project main image" class="w-full h-full object-cover">
+            
+            <!-- PERUBAHAN HTML: <img id="detail-img"> diganti dengan <div> container -->
+            <div id="detail-media-container" class="mt-12 overflow-hidden rounded-none content-reveal">
+                <!-- Konten (video atau gambar) akan dimasukkan oleh JavaScript di sini -->
             </div>
+            <!-- AKHIR PERUBAHAN HTML -->
             
             <div id="detail-icon-link-container" class="text-center mt-4 content-reveal"></div>
 
@@ -538,7 +542,31 @@ Key features include:
 
             document.getElementById('detail-category').textContent = data.category;
             document.getElementById('detail-title').textContent = data.title;
-            document.getElementById('detail-img').src = data.img;
+            
+            // --- PERUBAHAN JAVASCRIPT ---
+            // Logika untuk memuat video atau gambar
+            const mediaContainer = document.getElementById('detail-media-container');
+            mediaContainer.innerHTML = ''; // Kosongkan container
+
+            if (data.title === "Project OmniFolio (v26)") {
+                // Jika ini adalah Project OmniFolio, muat video
+                const videoFrame = document.createElement('iframe');
+                videoFrame.className = "w-full aspect-video"; // Gunakan aspect-video untuk rasio
+                videoFrame.src = "https://youtu.be/4clvParJ1iw?si=YBRasOvoQT7V2W_5";
+                videoFrame.frameBorder = "0";
+                videoFrame.allow = "autoplay; encrypted-media";
+                videoFrame.allowFullscreen = true;
+                mediaContainer.appendChild(videoFrame);
+            } else {
+                // Jika proyek lain, muat gambar seperti biasa
+                const image = document.createElement('img');
+                image.src = data.img;
+                image.alt = "Project main image";
+                image.className = "w-full h-full object-cover";
+                mediaContainer.appendChild(image);
+            }
+            // --- AKHIR PERUBAHAN JAVASCRIPT ---
+
             document.getElementById('detail-client').textContent = data.client;
             document.getElementById('detail-role').textContent = data.role;
             
@@ -647,6 +675,10 @@ Key features include:
             projectDetailView.querySelectorAll('.content-reveal').forEach(el => {
                 el.classList.remove('visible');
             });
+            
+            // Saat detail ditutup, hapus media apa pun untuk menghentikan video
+            const mediaContainer = document.getElementById('detail-media-container');
+            mediaContainer.innerHTML = '';
         }
         
         function showPasswordPage() {
