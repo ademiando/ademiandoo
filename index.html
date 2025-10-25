@@ -540,8 +540,8 @@ Key features include:
             document.getElementById('detail-category').textContent = data.category;
             document.getElementById('detail-title').textContent = data.title;
             
-            // --- BAGIAN MEDIA UTAMA (DIUBAH) ---
-            // Logika if/else dihapus. Sekarang selalu memuat data.img.
+            // --- BAGIAN MEDIA UTAMA ---
+            // Selalu memuat data.img (gambar utama)
             const mediaContainer = document.getElementById('detail-media-container');
             mediaContainer.innerHTML = ''; 
             const image = document.createElement('img');
@@ -593,7 +593,7 @@ Key features include:
                 iconLinkContainer.appendChild(linkIcon);
             }
             
-            // --- BAGIAN CASE STUDY (DIUBAH) ---
+            // --- BAGIAN CASE STUDY (DIPERBAIKI) ---
             const caseStudyContainer = document.getElementById('case-study-section');
             caseStudyContainer.innerHTML = '';
             
@@ -638,6 +638,7 @@ Key features include:
             caseStudyContainer.innerHTML = caseStudyHTML;
             // --- AKHIR BAGIAN CASE STUDY ---
             
+            // --- BAGIAN RELATED PROJECTS (DIPERBAIKI) ---
             const relatedProjectsContainer = document.getElementById('related-projects-section');
             relatedProjectsContainer.innerHTML = `
                 <div class="max-w-4xl mx-auto text-center">
@@ -645,7 +646,7 @@ Key features include:
                     <div class="grid grid-cols-3 gap-4 mt-8">
                         <a href="#" class="related-card overflow-hidden" data-index="0"><img src="assets/assets1.jpg" class="w-full h-full object-cover"></a>
                         <a href="#" class="related-card overflow-hidden" data-index="1"><img src="assets/assets2.jpg" class="w-full h-full object-cover"></a>
-                        <a href="#" class="related-card overflow-hidden" data-index="2"><img src="assets.assets3.jpg" class="w-full h-full object-cover"></a>
+                        <a href="#" class="related-card overflow-hidden" data-index="2"><img src="assets/assets3.jpg" class="w-full h-full object-cover"></a>
                     </div>
                 </div>
                 <div class="mt-12 py-4 flex justify-between items-center">
@@ -654,6 +655,7 @@ Key features include:
                     <button id="next-project-btn" class="related-nav-btn text-sm tracking-widest px-4 sm:px-8">NEXT →</button>
                 </div>
             `;
+            // --- AKHIR BAGIAN RELATED PROJECTS ---
             
             document.body.classList.add('detail-view-active');
             projectDetailView.classList.add('visible');
