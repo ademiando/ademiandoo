@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Allocator - TradingView Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F3FA; }
+        
+        /* Custom Scrollbar for Asset List */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        
+        /* Chart Animations */
+        path.slice { transition: d 0.5s ease, fill 0.3s; cursor: pointer; }
+        path.slice:hover { opacity: 0.9; }
+        
+        /* Dropdown Search Style */
+        .search-result-item:hover { background-color: #f1f5f9; cursor: pointer; }
+
+        /* Label Styling */
+        text.ticker-label { font-size: 14px; font-weight: 700; fill: #1e293b; }
+        text.percent-label { font-size: 12px; font-weight: 500; fill: #64748b; }
+        
+        /* Container Image Center */
+        .center-image-container {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <aside class="w-full md:w-[400px] bg-white border-r border-slate-200 flex flex-col z-20 shadow-xl h-full">
+        
+        <!-- Header -->
+        <div class="p-5 border-b border-slate-100">
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <span class="bg-black text-white px-2 py-0.5 rounded text-sm">TV</span> 
+                Portfolio Pie
+            </h1>
+            <p class="text-xs text-slate-500 mt-1">Buat grafik alokasi aset presisi.</p>
+        </div>
+
+        <!-- SEARCH BOX (TradingView Style) -->
+        <div class="p-4 bg-slate-50 border-b border-slate-200 relative">
+            <label class="text-xs font-semibold text-slate-500 uppercase mb-2 block tracking-wider">Tambah Aset / Ticker</label>
+            <div class="relative">
+                <input type="text" id="ticker-search" 
+                    class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                    placeholder="Cari (misal: BBCA, AAPL, Bitcoin)..." autocomplete="off">
+                
+                <!-- Search Icon -->
+                <svg class="absolute left-3 top-3 text-slate-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                
+                <!-- DROPDOWN RESULTS -->
+                <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50">
+                    <!-- Results injected here via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ASSET LIST EDITOR -->
+        <div class="flex-1 overflow-y-auto p-4 custom-scroll" id="asset-list">
+            <!-- Asset Items injected here -->
+        </div>
+
+        <!-- BOTTOM CONTROLS -->
+        <div class="p-4 border-t border-slate-200 bg-slate-50 grid grid-cols-2 gap-3">
+            <!-- Upload Button -->
+            <button onclick="document.getElementById('file-input').click()" class="col-span-1 flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-sm font-medium transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Ganti Foto
+            </button>
+            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+
+            <!-- Reset -->
+            <button onclick="resetPortfolio()" class="col-span-1 py-2.5 bg-white border border-red-200 hover:bg-red-50 text-red-600 rounded-lg text-sm font-medium transition shadow-sm">
+                Reset Data
+            </button>
+        </div>
+    </aside>
+
+    <!-- RIGHT PANEL: PREVIEW -->
+    <main class="flex-1 relative flex items-center justify-center bg-[#F0F3FA] p-4 md:p-8">
+        
+        <!-- Canvas Container -->
+        <div class="relative w-full max-w-[800px] aspect-[4/3] md:aspect-video bg-white rounded-2xl shadow-2xl flex items-center justify-center overflow-hidden border border-slate-100">
+            
+            <!-- Judul Kecil di Canvas -->
+            <div class="absolute top-6 left-6 z-10">
+                <h3 class="text-slate-400 text-xs font-bold tracking-[0.2em] uppercase">Allocation Breakdown</h3>
+            </div>
+
+            <!-- SVG CHART -->
+            <svg id="chart-svg" viewBox="0 0 800 600" class="w-full h-full block overflow-visible"></svg>
+
+            <!-- CENTER PROFILE IMAGE -->
+            <!-- Menggunakan HTML di atas SVG untuk memudahkan styling bulat sempurna -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] md:w-[160px] md:h-[160px] rounded-full bg-white p-1 shadow-lg z-10 pointer-events-none">
+                <div class="w-full h-full rounded-full overflow-hidden relative bg-slate-200 center-image-container">
+                    <img id="profile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Warren_Buffett_KU_Visit.jpg/800px-Warren_Buffett_KU_Visit.jpg" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Total Value Floating -->
+            <div class="absolute bottom-6 right-6 text-right">
+                <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Holdings</p>
+                <p class="text-2xl font-bold text-slate-800" id="total-display">100%</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. DATABASE SAHAM (MOCK DATA TRADINGVIEW) ---
+        // Ini mensimulasikan pencarian ticker.
+        const stockDatabase = [
+            { s: "BBCA", n: "Bank Central Asia", logo: "https://logo.clearbit.com/bca.co.id" },
+            { s: "BBRI", n: "Bank Rakyat Indonesia", logo: "https://logo.clearbit.com/bri.co.id" },
+            { s: "TLKM", n: "Telkom Indonesia", logo: "https://logo.clearbit.com/telkom.co.id" },
+            { s: "BMRI", n: "Bank Mandiri", logo: "https://logo.clearbit.com/bankmandiri.co.id" },
+            { s: "ASII", n: "Astra International", logo: "https://logo.clearbit.com/astra.co.id" },
+            { s: "GOTO", n: "GoTo Gojek Tokopedia", logo: "https://logo.clearbit.com/gotocompany.com" },
+            { s: "AAPL", n: "Apple Inc.", logo: "https://logo.clearbit.com/apple.com" },
+            { s: "MSFT", n: "Microsoft Corp", logo: "https://logo.clearbit.com/microsoft.com" },
+            { s: "TSLA", n: "Tesla Inc.", logo: "https://logo.clearbit.com/tesla.com" },
+            { s: "NVDA", n: "Nvidia Corp", logo: "https://logo.clearbit.com/nvidia.com" },
+            { s: "GOOGL", n: "Alphabet Inc.", logo: "https://logo.clearbit.com/abc.xyz" },
+            { s: "AMZN", n: "Amazon.com", logo: "https://logo.clearbit.com/amazon.com" },
+            { s: "META", n: "Meta Platforms", logo: "https://logo.clearbit.com/meta.com" },
+            { s: "NFLX", n: "Netflix", logo: "https://logo.clearbit.com/netflix.com" },
+            { s: "KO", n: "Coca-Cola", logo: "https://logo.clearbit.com/coca-colacompany.com" },
+            { s: "MCD", n: "McDonald's", logo: "https://logo.clearbit.com/mcdonalds.com" },
+            { s: "BTC", n: "Bitcoin", logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.png" },
+            { s: "ETH", n: "Ethereum", logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png" },
+            { s: "XAU", n: "Gold", logo: "https://cdn-icons-png.flaticon.com/512/1040/1040237.png" }
+        ];
+
+        // Default Assets
+        const defaultAssets = [
+            { ticker: "AAPL", value: 25, color: "#3B82F6", logo: stockDatabase[6].logo },
+            { ticker: "BBCA", value: 20, color: "#10B981", logo: stockDatabase[0].logo },
+            { ticker: "TLKM", value: 15, color: "#EF4444", logo: stockDatabase[2].logo },
+            { ticker: "TSLA", value: 10, color: "#F59E0B", logo: stockDatabase[8].logo },
+            { ticker: "CASH", value: 30, color: "#64748B", logo: "" }
+        ];
+
+        let portfolio = JSON.parse(JSON.stringify(defaultAssets));
+
+        // --- 2. LOGIC PENCARIAN & INPUT ---
+        const searchInput = document.getElementById('ticker-search');
+        const resultsBox = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toUpperCase();
+            if (val.length < 1) {
+                resultsBox.classList.add('hidden');
+                return;
+            }
+
+            const matches = stockDatabase.filter(item => 
+                item.s.includes(val) || item.n.toUpperCase().includes(val)
+            );
+
+            // Tambahkan opsi "Custom" jika tidak ketemu
+            if (!matches.some(m => m.s === val)) {
+                matches.push({ s: val, n: "Custom Asset", logo: "" });
+            }
+
+            renderDropdown(matches);
+        });
+
+        function renderDropdown(items) {
+            resultsBox.innerHTML = '';
+            resultsBox.classList.remove('hidden');
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-3 p-3 search-result-item border-b border-slate-100 last:border-0";
+                div.onclick = () => addAssetFromSearch(item);
+                
+                const imgHTML = item.logo ? `<img src="${item.logo}" class="w-6 h-6 rounded-full object-cover">` : `<div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">${item.s[0]}</div>`;
+
+                div.innerHTML = `
+                    ${imgHTML}
+                    <div>
+                        <div class="font-bold text-sm text-slate-800">${item.s}</div>
+                        <div class="text-xs text-slate-500 truncate max-w-[200px]">${item.n}</div>
+                    </div>
+                `;
+                resultsBox.appendChild(div);
+            });
+        }
+
+        function addAssetFromSearch(item) {
+            // Cek warna random yang aesthetic
+            const colors = ["#3B82F6", "#10B981", "#EF4444", "#F59E0B", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"];
+            const randomColor = colors[portfolio.length % colors.length];
+
+            portfolio.push({
+                ticker: item.s,
+                value: 10, // Default value
+                color: randomColor,
+                logo: item.logo
+            });
+
+            searchInput.value = '';
+            resultsBox.classList.add('hidden');
+            renderAssetList();
+            drawChart();
+        }
+
+        // --- 3. EDITOR LIST MANAGEMENT ---
+        function renderAssetList() {
+            const container = document.getElementById('asset-list');
+            container.innerHTML = '';
+
+            portfolio.forEach((asset, idx) => {
+                const div = document.createElement('div');
+                div.className = "mb-3 bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:shadow-md transition flex items-center gap-3";
+                
+                div.innerHTML = `
+                    <div class="relative w-8 h-8 flex-shrink-0">
+                        <div class="absolute inset-0 rounded-full border border-slate-200 overflow-hidden" style="background-color: ${asset.color}">
+                             <input type="color" value="${asset.color}" class="opacity-0 w-full h-full cursor-pointer" 
+                                onchange="updateAsset(${idx}, 'color', this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-bold text-slate-800">${asset.ticker}</div>
+                        <input type="range" min="1" max="100" value="${asset.value}" 
+                            class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-1"
+                            oninput="updateAsset(${idx}, 'value', this.value)">
+                    </div>
+
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="relative">
+                            <input type="number" value="${asset.value}" class="w-12 text-right text-sm font-bold border-b border-slate-200 focus:border-blue-500 outline-none"
+                            oninput="updateAsset(${idx}, 'value', this.value)">
+                            <span class="text-xs text-slate-400">%</span>
+                        </div>
+                        <button onclick="removeAsset(${idx})" class="text-xs text-red-400 hover:text-red-600">Hapus</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateAsset(idx, field, val) {
+            if (field === 'value') val = parseFloat(val) || 0;
+            portfolio[idx][field] = val;
+            drawChart(); // Realtime update
+        }
+
+        function removeAsset(idx) {
+            if(portfolio.length <= 1) return alert("Minimal harus ada 1 aset.");
+            portfolio.splice(idx, 1);
+            renderAssetList();
+            drawChart();
+        }
+
+        function resetPortfolio() {
+            portfolio = JSON.parse(JSON.stringify(defaultAssets));
+            renderAssetList();
+            drawChart();
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('profile-img').src = ev.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // --- 4. CORE CHART RENDERING (The Math Part) ---
+        function drawChart() {
+            const svg = document.getElementById('chart-svg');
+            svg.innerHTML = ''; // Clear canvas
+
+            const width = 800;
+            const height = 600;
+            const cx = width / 2;
+            const cy = height / 2;
+            const radius = 180; // Radius Luar
+            const innerRadius = 95; // Radius Dalam (Lubang)
+
+            // Hitung total
+            const total = portfolio.reduce((sum, item) => sum + item.value, 0);
+            
+            // Variabel bantu
+            let startAngle = -Math.PI / 2; // Mulai jam 12
+            
+            // Loop setiap aset
+            portfolio.forEach((asset, idx) => {
+                const sliceAngle = (asset.value / total) * 2 * Math.PI;
+                const endAngle = startAngle + sliceAngle;
+                const midAngle = startAngle + sliceAngle / 2;
+
+                // --- A. Gambar Potongan Donut ---
+                const x1 = cx + radius * Math.cos(startAngle);
+                const y1 = cy + radius * Math.sin(startAngle);
+                const x2 = cx + radius * Math.cos(endAngle);
+                const y2 = cy + radius * Math.sin(endAngle);
+
+                const x1_in = cx + innerRadius * Math.cos(startAngle);
+                const y1_in = cy + innerRadius * Math.sin(startAngle);
+                const x2_in = cx + innerRadius * Math.cos(endAngle);
+                const y2_in = cy + innerRadius * Math.sin(endAngle);
+
+                // Jika lingkaran penuh (1 aset saja), handling khusus
+                let pathD = "";
+                if (portfolio.length === 1) {
+                    pathD = `
+                        M ${cx} ${cy - radius}
+                        A ${radius} ${radius} 0 1 1 ${cx} ${cy + radius}
+                        A ${radius} ${radius} 0 1 1 ${cx} ${cy - radius}
+                        M ${cx} ${cy - innerRadius}
+                        A ${innerRadius} ${innerRadius} 0 1 0 ${cx} ${cy + innerRadius}
+                        A ${innerRadius} ${innerRadius} 0 1 0 ${cx} ${cy - innerRadius}
+                        Z
+                    `;
+                } else {
+                    const largeArc = sliceAngle > Math.PI ? 1 : 0;
+                    pathD = `
+                        M ${x1} ${y1}
+                        A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}
+                        L ${x2_in} ${y2_in}
+                        A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x1_in} ${y1_in}
+                        Z
+                    `;
+                }
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", pathD);
+                path.setAttribute("fill", asset.color);
+                path.setAttribute("stroke", "white");
+                path.setAttribute("stroke-width", "3");
+                path.setAttribute("class", "slice");
+                svg.appendChild(path);
+
+                // --- B. Gambar Garis Penunjuk (Elbow Line) ---
+                const labelR = radius + 40; // Jarak label dari pusat
+                const elbowR = radius + 20; // Jarak tekukan
+                
+                const elbowX = cx + elbowR * Math.cos(midAngle);
+                const elbowY = cy + elbowR * Math.sin(midAngle);
+                
+                // Tentukan sisi (Kiri/Kanan)
+                const isRight = (midAngle >= -Math.PI/2 && midAngle <= Math.PI/2);
+                
+                const labelX = isRight ? elbowX + 50 : elbowX - 50;
+                const labelY = elbowY;
+
+                // Titik mulai garis (di pinggir donut)
+                const edgeX = cx + radius * Math.cos(midAngle);
+                const edgeY = cy + radius * Math.sin(midAngle);
+
+                const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+                polyline.setAttribute("points", `${edgeX},${edgeY} ${elbowX},${elbowY} ${labelX},${labelY}`);
+                polyline.setAttribute("fill", "none");
+                polyline.setAttribute("stroke", "#94a3b8");
+                polyline.setAttribute("stroke-width", "1.5");
+                svg.appendChild(polyline);
+
+                // --- C. Gambar Teks Label ---
+                const percentVal = Math.round((asset.value / total) * 100) + "%";
+                
+                // Ticker Text
+                const textTicker = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textTicker.setAttribute("x", isRight ? labelX + 8 : labelX - 8);
+                textTicker.setAttribute("y", labelY - 5);
+                textTicker.setAttribute("text-anchor", isRight ? "start" : "end");
+                textTicker.setAttribute("class", "ticker-label");
+                textTicker.textContent = asset.ticker;
+                svg.appendChild(textTicker);
+
+                // Percent Text
+                const textPercent = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textPercent.setAttribute("x", isRight ? labelX + 8 : labelX - 8);
+                textPercent.setAttribute("y", labelY + 14);
+                textPercent.setAttribute("text-anchor", isRight ? "start" : "end");
+                textPercent.setAttribute("class", "percent-label");
+                textPercent.textContent = percentVal;
+                svg.appendChild(textPercent);
+
+                // --- D. Gambar LOGO di dalam Donut ---
+                if (sliceAngle > 0.15 && asset.logo) { // Hanya jika slice cukup besar dan ada logo
+                    const logoDist = innerRadius + (radius - innerRadius) / 2;
+                    const logoX = cx + logoDist * Math.cos(midAngle);
+                    const logoY = cy + logoDist * Math.sin(midAngle);
+                    const size = 28;
+
+                    // ClipPath untuk membuat logo bulat
+                    const clipId = `clip-${idx}`;
+                    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                    const cp = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
+                    cp.setAttribute("id", clipId);
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", logoX);
+                    circle.setAttribute("cy", logoY);
+                    circle.setAttribute("r", size/2);
+                    cp.appendChild(circle);
+                    defs.appendChild(cp);
+                    svg.appendChild(defs);
+
+                    // Background putih di belakang logo
+                    const bg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    bg.setAttribute("cx", logoX);
+                    bg.setAttribute("cy", logoY);
+                    bg.setAttribute("r", (size/2) + 2);
+                    bg.setAttribute("fill", "white");
+                    svg.appendChild(bg);
+
+                    // Gambar Logo
+                    const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                    img.setAttribute("href", asset.logo);
+                    img.setAttribute("x", logoX - size/2);
+                    img.setAttribute("y", logoY - size/2);
+                    img.setAttribute("width", size);
+                    img.setAttribute("height", size);
+                    img.setAttribute("clip-path", `url(#${clipId})`);
+                    
+                    // Fallback jika error load gambar -> Sembunyikan
+                    img.onerror = function() { this.style.display = 'none'; };
+                    
+                    svg.appendChild(img);
+                }
+
+                // Update startAngle untuk slice berikutnya
+                startAngle = endAngle;
+            });
+        }
+
+        // Initialize
+        window.onload = function() {
+            renderAssetList();
+            drawChart();
+        }
+
+        // Klik di luar dropdown untuk menutup search
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+                resultsBox.classList.add('hidden');
+            }
+        });
+
+    </script>
+</body>
+</html>
+
