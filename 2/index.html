@@ -3,396 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portfolio Donut Maker - Pro Version</title>
+    <title>Portfolio Pro Builder - Buffett Style</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #fcfcfc;
+            color: #111;
+        }
         
-        /* Mengatur ketebalan irisan donat agar terlihat premium */
-        path.slice {
-            transition: opacity 0.3s ease, transform 0.3s ease;
+        #canvas-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        svg {
+            overflow: visible;
+        }
+
+        .slice {
+            transition: all 0.6s cubic-bezier(0.2, 1, 0.3, 1);
             stroke: #fff;
-            stroke-width: 2px;
+            stroke-width: 2;
         }
-        
-        path.slice:hover {
-            opacity: 0.85;
+
+        .no-spinner::-webkit-inner-spin-button,
+        .no-spinner::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .img-placeholder {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+        }
+
+        input[type=range] {
+            height: 4px;
+            -webkit-appearance: none;
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #000;
             cursor: pointer;
-        }
-
-        /* Styling garis penunjuk agar tidak kaku */
-        polyline {
-            fill: none;
-            stroke: #94a3b8;
-            stroke-width: 1.5px;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* Custom Scrollbar */
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        /* Mencegah input angka meluap */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-        .chart-container {
-            filter: drop-shadow(0 20px 25px rgb(0 0 0 / 0.1));
-        }
-
-        /* Animasi dropdown */
-        #search-results {
-            animation: fadeIn 0.2s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="flex flex-col lg:flex-row h-screen">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- PANEL KONTROL (Kiri) -->
-    <aside class="w-full lg:w-[420px] bg-white border-r border-slate-200 flex flex-col h-full z-30 shadow-2xl lg:shadow-none">
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold text-slate-900 tracking-tight">Portfolio Donut</h1>
-                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Asset Allocation Creator</p>
-            </div>
-            <button onclick="document.getElementById('file-input').click()" class="bg-blue-50 p-2 rounded-full text-blue-600 hover:bg-blue-100 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+    <!-- PANEL KONTROL MINIMALIS -->
+    <aside class="w-full md:w-[400px] bg-white border-r border-slate-100 flex flex-col h-[40%] md:h-full z-30 shadow-sm">
+        <div class="p-8 border-b border-slate-50">
+            <h1 class="text-2xl font-black tracking-tighter mb-1">PRO BUILDER</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Sistem Alokasi Portofolio</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-6" id="asset-list">
+            <!-- Items rendered via JS -->
+        </div>
+
+        <div class="p-8 bg-slate-50/50 space-y-4">
+            <button onclick="addAsset()" class="w-full py-4 bg-black text-white rounded-xl font-bold text-xs tracking-widest hover:bg-slate-800 transition shadow-lg active:scale-95">
+                + TAMBAH ASET
             </button>
-        </div>
-
-        <!-- SEARCH AREA -->
-        <div class="p-4 bg-slate-50/50 border-b border-slate-100 relative">
-            <div class="relative">
-                <input type="text" id="search-input" 
-                    class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition shadow-sm"
-                    placeholder="Cari Saham (BBCA, AAPL, BTC)..." autocomplete="off">
-                <svg class="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                
-                <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-64 overflow-y-auto z-50 p-2">
-                    <!-- Hasil cari di sini -->
-                </div>
+            <div class="flex justify-between items-center px-1">
+                <button onclick="resetData()" class="text-[10px] font-bold text-slate-300 hover:text-red-500 uppercase tracking-widest">Reset</button>
+                <span class="text-[10px] font-bold text-slate-300 uppercase italic">Auto-Balance 100%</span>
             </div>
-        </div>
-
-        <!-- LIST EDITOR -->
-        <div class="flex-1 overflow-y-auto p-4 custom-scroll" id="asset-list">
-            <!-- Items injected by JS -->
-        </div>
-
-        <!-- BUTTONS -->
-        <div class="p-4 bg-slate-50 border-t border-slate-100 grid grid-cols-2 gap-3">
-            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
-            <button onclick="resetData()" class="px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-100 transition shadow-sm">Reset</button>
-            <button onclick="downloadChart()" class="px-4 py-3 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition shadow-sm">Simpan</button>
         </div>
     </aside>
 
-    <!-- AREA PREVIEW (Kanan) -->
-    <main class="flex-1 relative flex items-center justify-center p-4 md:p-12 overflow-hidden bg-slate-100">
-        <!-- Dekorasi Background -->
-        <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(#64748b 0.5px, transparent 0.5px); background-size: 24px 24px;"></div>
+    <!-- AREA VISUALISASI PROFESIONAL -->
+    <main class="flex-1 relative flex flex-col items-center justify-between p-12">
         
-        <div class="relative w-full max-w-[850px] aspect-[4/3] bg-white rounded-[2.5rem] shadow-2xl flex items-center justify-center border border-white overflow-hidden chart-container">
+        <div class="w-full max-w-5xl flex-1 flex flex-col items-center justify-center relative">
             
-            <!-- Judul Visual -->
-            <div class="absolute top-10 left-10 hidden md:block">
-                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.3em] mb-1">Live Preview</p>
-                <h2 class="text-xl font-bold text-slate-900">Portfolio Breakdown</h2>
-            </div>
+            <div id="canvas-area" class="relative w-full h-full flex items-center justify-center">
+                <!-- SVG GRAFIK -->
+                <svg id="chart-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet" class="w-full h-full max-w-2xl">
+                    <!-- Digambar via JS -->
+                </svg>
 
-            <!-- SVG DONUT -->
-            <svg id="donut-svg" viewBox="0 0 800 600" class="w-full h-full overflow-visible"></svg>
-
-            <!-- PROFILE PHOTO (Tengah) -->
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <!-- Outer Ring -->
-                <div class="w-[150px] h-[150px] md:w-[190px] md:h-[190px] rounded-full bg-white p-1 shadow-xl flex items-center justify-center">
-                    <!-- Photo container -->
-                    <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border border-slate-100">
-                        <img id="profile-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Warren_Buffett_KU_Visit.jpg/800px-Warren_Buffett_KU_Visit.jpg" 
-                             class="w-full h-full object-cover">
+                <!-- PUSAT DONUT (FOTO) -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div onclick="document.getElementById('profile-input').click()" class="w-32 h-32 md:w-52 md:h-52 rounded-full bg-white p-2 shadow-[0_20px_50px_rgba(0,0,0,0.1)] cursor-pointer hover:scale-105 transition-transform duration-700 overflow-hidden">
+                        <div id="img-container" class="w-full h-full rounded-full overflow-hidden img-placeholder flex items-center justify-center">
+                            <img id="profile-img" class="w-full h-full object-cover hidden">
+                            <svg id="cam-icon" class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer Stats -->
-            <div class="absolute bottom-10 right-10 text-right hidden md:block">
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Calculated Precision</p>
-                <p class="text-3xl font-black text-slate-900" id="total-val">100%</p>
+            <input type="file" id="profile-input" class="hidden" accept="image/*" onchange="handleImage(event)">
+
+            <!-- KETERANGAN HOLDING (BAWAH) -->
+            <div class="mt-12 text-center opacity-80">
+                <div class="flex flex-col items-center">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.5em] mb-3">Total Holdings Analysis</p>
+                    <div class="h-px w-12 bg-slate-200 mb-4"></div>
+                    <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter">ALOKASI 100%</h2>
+                </div>
             </div>
+            
         </div>
     </main>
 
     <script>
-        // Data Saham & Logo
-        const tickerLibrary = [
-            { s: "AAPL", n: "Apple Inc.", l: "https://logo.clearbit.com/apple.com", c: "#2FA4E7" },
-            { s: "BBCA", n: "Bank BCA", l: "https://logo.clearbit.com/bca.co.id", c: "#003594" },
-            { s: "BBRI", n: "Bank BRI", l: "https://logo.clearbit.com/bri.co.id", c: "#00529C" },
-            { s: "TLKM", n: "Telkom Indonesia", l: "https://logo.clearbit.com/telkom.co.id", c: "#ED1C24" },
-            { s: "ASII", n: "Astra International", l: "https://logo.clearbit.com/astra.co.id", c: "#005CAB" },
-            { s: "TSLA", n: "Tesla, Inc.", l: "https://logo.clearbit.com/tesla.com", c: "#E31937" },
-            { s: "GOOGL", n: "Alphabet Inc.", l: "https://logo.clearbit.com/abc.xyz", c: "#4285F4" },
-            { s: "MSFT", n: "Microsoft Corp", l: "https://logo.clearbit.com/microsoft.com", c: "#00A4EF" },
-            { s: "KO", n: "Coca-Cola", l: "https://logo.clearbit.com/coca-colacompany.com", c: "#F40009" },
-            { s: "AXP", n: "American Express", l: "https://logo.clearbit.com/americanexpress.com", c: "#006fcf" },
-            { s: "BAC", n: "Bank of America", l: "https://logo.clearbit.com/bankofamerica.com", c: "#004a99" },
-            { s: "CVX", n: "Chevron", l: "https://logo.clearbit.com/chevron.com", c: "#005696" },
-            { s: "OXY", n: "Occidental", l: "https://logo.clearbit.com/oxy.com", c: "#ee2e24" },
-            { s: "BTC", n: "Bitcoin", l: "https://cryptologos.cc/logos/bitcoin-btc-logo.png", c: "#F7931A" },
-            { s: "ETH", n: "Ethereum", l: "https://cryptologos.cc/logos/ethereum-eth-logo.png", c: "#627EEA" }
-        ];
+        // TradingView Logo Service
+        function getLogo(ticker) {
+            ticker = ticker.toUpperCase().trim();
+            if (ticker === 'BTC' || ticker === 'ETH') return `https://s3-symbol.tradingview.com/crypto/X-${ticker}.svg`;
+            return `https://s3-symbol.tradingview.com/symbol/${ticker}.svg`;
+        }
 
+        // Data Awal (Referansi Buffett)
         let assets = [
-            { s: "AAPL", v: 23, c: "#2FA4E7", l: "https://logo.clearbit.com/apple.com" },
-            { s: "AXP", v: 19, c: "#7CB82F", l: "https://logo.clearbit.com/americanexpress.com" },
-            { s: "BAC", v: 11, c: "#EBC91E", l: "https://logo.clearbit.com/bankofamerica.com" },
-            { s: "KO", v: 10, c: "#E07B26", l: "https://logo.clearbit.com/coca-colacompany.com" },
-            { s: "CVX", v: 7, c: "#DE3535", l: "https://logo.clearbit.com/chevron.com" },
-            { s: "OXY", v: 5, c: "#8E56B6", l: "https://logo.clearbit.com/oxy.com" },
-            { s: "OTHER", v: 25, c: "#45738F", l: "" }
+            { t: "AAPL", v: 38, c: "#222222" },
+            { t: "BAC", v: 22, c: "#0047bb" },
+            { t: "AXP", v: 18, c: "#007bc1" },
+            { t: "KO", v: 12, c: "#fe001a" },
+            { t: "OTHER", v: 10, c: "#64748b" }
         ];
-
-        // UI & Logic
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
 
         function init() {
             renderList();
             drawChart();
+        }
+
+        // Smart Allocation: Satu berubah, sisanya menyesuaikan proporsional
+        function adjust(index, newVal) {
+            newVal = Math.max(1, Math.min(96, newVal));
+            const diff = newVal - assets[index].v;
+            const othersSum = assets.reduce((s, a, i) => i !== index ? s + a.v : s, 0);
             
-            // Event Pencarian
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toUpperCase();
-                if (term.length === 0) { searchResults.classList.add('hidden'); return; }
-                
-                const matches = tickerLibrary.filter(x => x.s.includes(term) || x.n.toUpperCase().includes(term));
-                if (matches.length > 0) {
-                    searchResults.innerHTML = matches.map(m => `
-                        <div onclick='addAsset("${m.s}")' class="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer rounded-lg transition">
-                            <img src="${m.l}" class="w-6 h-6 rounded-full border border-slate-100">
-                            <div>
-                                <div class="text-sm font-bold text-slate-800">${m.s}</div>
-                                <div class="text-[10px] text-slate-400">${m.n}</div>
-                            </div>
-                        </div>
-                    `).join('');
-                    searchResults.classList.remove('hidden');
-                } else {
-                    searchResults.innerHTML = `<div onclick='addCustom("${term}")' class="p-3 text-sm text-slate-500 hover:bg-slate-50 cursor-pointer">Tambah "${term}" sebagai aset kustom</div>`;
+            assets[index].v = newVal;
+            assets.forEach((a, i) => {
+                if (i !== index) {
+                    const ratio = a.v / othersSum;
+                    a.v -= diff * ratio;
                 }
             });
+
+            // Normalisasi pembulatan
+            const total = assets.reduce((s, a) => s + a.v, 0);
+            if (total !== 100) {
+                const adj = (100 - total) / (assets.length - 1);
+                assets.forEach((a, i) => { if (i !== index) a.v += adj; });
+            }
+
+            renderList();
+            drawChart();
         }
 
         function renderList() {
-            const list = document.getElementById('asset-list');
-            list.innerHTML = assets.map((a, i) => `
-                <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm mb-3 transition hover:shadow-md group">
-                    <div class="relative w-10 h-10 flex-shrink-0">
-                        <div class="w-full h-full rounded-full border-2 border-white shadow-sm flex items-center justify-center overflow-hidden" style="background-color: ${a.c}">
-                            ${a.l ? `<img src="${a.l}" class="w-6 h-6 object-contain">` : `<span class="text-[10px] font-bold text-white">${a.s[0]}</span>`}
-                        </div>
-                        <input type="color" value="${a.c}" oninput="updateAsset(${i}, 'c', this.value)" class="absolute inset-0 opacity-0 cursor-pointer">
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm font-bold text-slate-700 uppercase">${a.s}</span>
-                            <div class="flex items-center text-sm font-bold text-blue-600">
-                                <input type="number" value="${a.v}" oninput="updateAsset(${i}, 'v', this.value)" class="w-8 bg-transparent text-right outline-none">
-                                <span class="ml-0.5">%</span>
+            const container = document.getElementById('asset-list');
+            container.innerHTML = '';
+            assets.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = "group space-y-3";
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg relative overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                <input type="color" value="${item.c}" oninput="assets[${i}].c = this.value; drawChart();" class="absolute inset-0 opacity-0 cursor-pointer">
+                                <img src="${getLogo(item.t)}" class="w-full h-full object-contain p-2" onerror="this.style.opacity='0'">
+                                <div class="absolute inset-0 pointer-events-none" style="background-color:${item.c}; opacity: 0.05"></div>
                             </div>
+                            <input type="text" value="${item.t}" onchange="assets[${i}].t = this.value.toUpperCase(); renderList(); drawChart();" class="font-black text-sm tracking-tight bg-transparent outline-none w-20 uppercase">
                         </div>
-                        <input type="range" value="${a.v}" oninput="updateAsset(${i}, 'v', this.value)" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm font-bold text-slate-400">${Math.round(item.v)}%</span>
+                            <button onclick="removeAsset(${i})" class="opacity-0 group-hover:opacity-100 transition text-[9px] font-bold text-red-400 uppercase">Hapus</button>
+                        </div>
                     </div>
-                    <button onclick="removeAsset(${i})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">&times;</button>
-                </div>
-            `).join('');
+                    <input type="range" min="1" max="96" step="0.1" value="${item.v}" oninput="adjust(${i}, parseFloat(this.value))" class="w-full">
+                `;
+                container.appendChild(div);
+            });
         }
 
-        function updateAsset(idx, key, val) {
-            assets[idx][key] = key === 'v' ? (parseFloat(val) || 0) : val;
-            drawChart();
-            if (key === 'c') renderList(); // Update logo background color in list
-        }
-
-        function addAsset(ticker) {
-            const match = tickerLibrary.find(x => x.s === ticker);
-            assets.push({ s: match.s, v: 10, c: match.c, l: match.l });
-            finishAdd();
-        }
-
-        function addCustom(ticker) {
-            assets.push({ s: ticker, v: 10, c: "#94a3b8", l: "" });
-            finishAdd();
-        }
-
-        function finishAdd() {
-            searchInput.value = '';
-            searchResults.classList.add('hidden');
+        function addAsset() {
+            const share = 100 / (assets.length + 1);
+            assets.forEach(a => a.v = (100 - share) * (a.v / 100));
+            assets.push({ t: "TICKER", v: share, c: "#94a3b8" });
             renderList();
             drawChart();
         }
 
         function removeAsset(i) {
-            if (assets.length > 1) {
-                assets.splice(i, 1);
-                renderList();
-                drawChart();
-            }
+            if (assets.length <= 1) return;
+            const val = assets[i].v;
+            assets.splice(i, 1);
+            const factor = 100 / (100 - val);
+            assets.forEach(a => a.v *= factor);
+            renderList();
+            drawChart();
         }
 
         function resetData() {
             assets = [
-                { s: "AAPL", v: 23, c: "#2FA4E7", l: "https://logo.clearbit.com/apple.com" },
-                { s: "AXP", v: 19, c: "#7CB82F", l: "https://logo.clearbit.com/americanexpress.com" },
-                { s: "BAC", v: 11, c: "#EBC91E", l: "https://logo.clearbit.com/bankofamerica.com" },
-                { s: "KO", v: 10, c: "#E07B26", l: "https://logo.clearbit.com/coca-colacompany.com" },
-                { s: "CVX", v: 7, c: "#DE3535", l: "https://logo.clearbit.com/chevron.com" },
-                { s: "OXY", v: 5, c: "#8E56B6", l: "https://logo.clearbit.com/oxy.com" },
-                { s: "OTHER", v: 25, c: "#45738F", l: "" }
+                { t: "AAPL", v: 40, c: "#000000" },
+                { t: "BBCA", v: 30, c: "#003594" },
+                { t: "OTHER", v: 30, c: "#e2e8f0" }
             ];
             renderList();
             drawChart();
         }
 
-        function handleImageUpload(e) {
+        function handleImage(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => document.getElementById('profile-img').src = ev.target.result;
-                reader.readAsDataURL(file);
+                const r = new FileReader();
+                r.onload = (ex) => {
+                    const img = document.getElementById('profile-img');
+                    img.src = ex.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('cam-icon').classList.add('hidden');
+                };
+                r.readAsDataURL(file);
             }
         }
 
-        // --- MATH & DRAWING (SVG) ---
         function drawChart() {
-            const svg = document.getElementById('donut-svg');
+            const svg = document.getElementById('chart-svg');
             svg.innerHTML = '';
-            
-            const total = assets.reduce((sum, a) => sum + a.v, 0);
-            document.getElementById('total-val').innerText = (total > 0 ? Math.round(total) : 0) + "%";
-
             const cx = 400, cy = 300;
-            const radius = 220;
-            const innerRadius = 115; // Ketebalan Donut diatur di sini (Donut Tebal)
+            const radius = 250; 
+            const innerRadius = 110; // KETEBALAN MASIF (FAT DONUT)
             
-            let currentAngle = -Math.PI / 2;
+            let angle = -Math.PI / 2;
 
             assets.forEach((asset, i) => {
-                const sliceAngle = (asset.v / total) * 2 * Math.PI;
-                const midAngle = currentAngle + (sliceAngle / 2);
+                const slice = (asset.v / 100) * 2 * Math.PI;
+                if (slice <= 0) return;
+
+                const mid = angle + (slice / 2);
                 
-                // Draw Slice
-                const x1 = cx + radius * Math.cos(currentAngle);
-                const y1 = cy + radius * Math.sin(currentAngle);
-                const x2 = cx + radius * Math.cos(currentAngle + sliceAngle);
-                const y2 = cy + radius * Math.sin(currentAngle + sliceAngle);
-                
-                const ix1 = cx + innerRadius * Math.cos(currentAngle);
-                const iy1 = cy + innerRadius * Math.sin(currentAngle);
-                const ix2 = cx + innerRadius * Math.cos(currentAngle + sliceAngle);
-                const iy2 = cy + innerRadius * Math.sin(currentAngle + sliceAngle);
+                // Paths
+                const x1 = cx + radius * Math.cos(angle);
+                const y1 = cy + radius * Math.sin(angle);
+                const x2 = cx + radius * Math.cos(angle + slice);
+                const y2 = cy + radius * Math.sin(angle + slice);
+                const ix1 = cx + innerRadius * Math.cos(angle);
+                const iy1 = cy + innerRadius * Math.sin(angle);
+                const ix2 = cx + innerRadius * Math.cos(angle + slice);
+                const iy2 = cy + innerRadius * Math.sin(angle + slice);
 
-                const largeArc = sliceAngle > Math.PI ? 1 : 0;
+                const large = slice > Math.PI ? 1 : 0;
+                const d = `M ${x1} ${y1} A ${radius} ${radius} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${large} 0 ${ix1} ${iy1} Z`;
 
-                const pathD = `
-                    M ${x1} ${y1}
-                    A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}
-                    L ${ix2} ${iy2}
-                    A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1}
-                    Z
-                `;
+                const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                p.setAttribute("d", d);
+                p.setAttribute("fill", asset.c);
+                p.setAttribute("class", "slice");
+                svg.appendChild(p);
 
-                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                path.setAttribute("d", pathD);
-                path.setAttribute("fill", asset.c);
-                path.setAttribute("class", "slice");
-                svg.appendChild(path);
-
-                // Draw Logo in Slice
-                if (sliceAngle > 0.1) {
-                    const logoRadius = innerRadius + (radius - innerRadius) / 2;
-                    const lx = cx + logoRadius * Math.cos(midAngle);
-                    const ly = cy + logoRadius * Math.sin(midAngle);
-                    
-                    if (asset.l) {
-                        const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-                        img.setAttribute("href", asset.l);
-                        img.setAttribute("x", lx - 15);
-                        img.setAttribute("y", ly - 15);
-                        img.setAttribute("width", "30");
-                        img.setAttribute("height", "30");
-                        img.style.filter = "drop-shadow(0 2px 4px rgba(0,0,0,0.2))";
-                        svg.appendChild(img);
-                    } else {
-                        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                        txt.setAttribute("x", lx);
-                        txt.setAttribute("y", ly);
-                        txt.setAttribute("text-anchor", "middle");
-                        txt.setAttribute("dominant-baseline", "middle");
-                        txt.setAttribute("fill", "white");
-                        txt.setAttribute("font-size", "10");
-                        txt.setAttribute("font-weight", "bold");
-                        txt.textContent = asset.s.substring(0, 4);
-                        svg.appendChild(txt);
-                    }
+                // Logo di tengah irisan (Buffett Style)
+                if (slice > 0.15) {
+                    const lr = innerRadius + (radius - innerRadius) / 2;
+                    const lx = cx + lr * Math.cos(mid);
+                    const ly = cy + lr * Math.sin(mid);
+                    const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                    img.setAttribute("href", getLogo(asset.t));
+                    img.setAttribute("x", lx - 22);
+                    img.setAttribute("y", ly - 22);
+                    img.setAttribute("width", "44");
+                    img.setAttribute("height", "44");
+                    img.setAttribute("style", "filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15))");
+                    img.onerror = function() { this.style.display = 'none'; };
+                    svg.appendChild(img);
                 }
 
-                // Draw Labels & Guidelines
-                const lineStartRadius = radius + 5;
-                const lineEndRadius = radius + 40;
-                
-                const lx1 = cx + lineStartRadius * Math.cos(midAngle);
-                const ly1 = cy + lineStartRadius * Math.sin(midAngle);
-                const lx2 = cx + lineEndRadius * Math.cos(midAngle);
-                const ly2 = cy + lineEndRadius * Math.sin(midAngle);
-                
-                const isRight = Math.cos(midAngle) > 0;
-                const flatX = isRight ? lx2 + 40 : lx2 - 40;
+                // Label & Garis (Gaya Minimalis Bersih)
+                const l1 = radius + 10;
+                const l2 = radius + 40;
+                const lx1 = cx + l1 * Math.cos(mid);
+                const ly1 = cy + l1 * Math.sin(mid);
+                const lx2 = cx + l2 * Math.cos(mid);
+                const ly2 = cy + l2 * Math.sin(mid);
+                const isR = Math.cos(mid) > 0;
+                const fx = isR ? lx2 + 30 : lx2 - 30;
 
                 const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-                poly.setAttribute("points", `${lx1},${ly1} ${lx2},${ly2} ${flatX},${ly2}`);
+                poly.setAttribute("points", `${lx1},${ly1} ${lx2},${ly2} ${fx},${ly2}`);
+                poly.setAttribute("fill", "none");
+                poly.setAttribute("stroke", "#eee");
+                poly.setAttribute("stroke-width", "1.5");
                 svg.appendChild(poly);
 
-                // Ticker Text
                 const t1 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                t1.setAttribute("x", isRight ? flatX + 8 : flatX - 8);
-                t1.setAttribute("y", ly2 - 4);
-                t1.setAttribute("text-anchor", isRight ? "start" : "end");
-                t1.setAttribute("font-weight", "bold");
-                t1.setAttribute("font-size", "14");
-                t1.setAttribute("fill", "#1e293b");
-                t1.textContent = asset.s;
+                t1.setAttribute("x", isR ? fx + 10 : fx - 10);
+                t1.setAttribute("y", ly2 - 6);
+                t1.setAttribute("text-anchor", isR ? "start" : "end");
+                t1.setAttribute("font-weight", "900");
+                t1.setAttribute("font-size", "18");
+                t1.setAttribute("fill", "#000");
+                t1.textContent = asset.t;
                 svg.appendChild(t1);
 
-                // Percent Text
                 const t2 = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                t2.setAttribute("x", isRight ? flatX + 8 : flatX - 8);
+                t2.setAttribute("x", isR ? fx + 10 : fx - 10);
                 t2.setAttribute("y", ly2 + 14);
-                t2.setAttribute("text-anchor", isRight ? "start" : "end");
+                t2.setAttribute("text-anchor", isR ? "start" : "end");
                 t2.setAttribute("font-size", "12");
-                t2.setAttribute("fill", "#64748b");
-                t2.textContent = Math.round((asset.v / total) * 100) + "%";
+                t2.setAttribute("font-weight", "600");
+                t2.setAttribute("fill", "#999");
+                t2.textContent = Math.round(asset.v) + "%";
                 svg.appendChild(t2);
 
-                currentAngle += sliceAngle;
+                angle += slice;
             });
         }
 
-        function downloadChart() {
-            // Sederhana: Karena browser tidak bisa simpan SVG kompleks ke PNG langsung tanpa library eksternal,
-            // cara terbaik untuk user adalah melakukan screenshot. 
-            // Namun saya sediakan print mode yang rapi.
-            window.print();
-        }
-
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
